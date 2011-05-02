@@ -1,0 +1,6 @@
+name: ServiceContracts
+main: com.bukkit.epuidokas.ServiceContracts.ServiceContractsPlugin
+version: 0.1
+author: Eric Puidokas
+website: www.puidokas.com
+description: Allows you to contract in-game services such as demolition and building
