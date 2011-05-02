@@ -10,6 +10,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import com.nijiko.coelho.iConomy.iConomy;
+import com.nijiko.permissions.PermissionHandler;
+import com.nijikokun.bukkit.Permissions.Permissions;
 import java.io.*;
 import java.util.*;
 
@@ -19,12 +21,11 @@ import java.util.*;
  */
 public class ServiceContractsPlugin extends JavaPlugin {
 
-    private final iConomy iconomy = null;
-
+    private static iConomy iconomy = null;
+    private static PermissionHandler permissions = null;
     private final ServiceContractsContracts contracts = new ServiceContractsContracts(this);
-
     private final ServiceContractsPlayerListener player_listener = new ServiceContractsPlayerListener(this);
-
+    private final ServiceContractsPluginListener plugin_listener = new ServiceContractsPluginListener(this);
     private final Properties strings = new Properties();
 
     public void onEnable() {
@@ -50,6 +51,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, player_listener, Event.Priority.Low, this);
         pm.registerEvent(Event.Type.PLAYER_INTERACT, player_listener, Event.Priority.Low, this);
+        pm.registerEvent(Event.Type.PLUGIN_ENABLE, plugin_listener, Event.Priority.Low, this);
 
         // Load successful
         log("loaded");
@@ -103,4 +105,36 @@ public class ServiceContractsPlugin extends JavaPlugin {
         PluginDescriptionFile pdfFile = this.getDescription();
         System.out.println("["+pdfFile.getName()+"]["+pdfFile.getVersion()+"] " + message);
     }
+
+    public iConomy getIconomy() {
+        return iconomy;
+    }
+
+    public boolean setIconomy(iConomy instance) {
+        if (instance.isEnabled()) {
+            iconomy = instance;
+            log("successfully linked with iConomy");
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public PermissionHandler getPermissions() {
+        return permissions;
+    }
+
+    public boolean setPermissions(Permissions instance) {
+        if (instance.isEnabled()) {
+            permissions = instance.getHandler();
+            log("successfully linked with Permissions");
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
 }
