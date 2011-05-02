@@ -34,9 +34,9 @@ public class ServiceContractsPlayerListener extends PlayerListener {
             ServiceContractsCommand command = new ServiceContractsCommand(plugin, event.getMessage());
             switch(command.getAction()) {
                 case 0:
-                    String commands[] = command.getCommandFormats(true);
-                    for(int i =0; i < commands.length; i++) {
-                        event.getPlayer().sendMessage(commands[i]);
+                    ArrayList<String> commands = command.getCommandFormats(true);
+                    for(int i =0; i < commands.size(); i++) {
+                        event.getPlayer().sendMessage(commands.get(i));
                     }
                     break;
                 case 1:

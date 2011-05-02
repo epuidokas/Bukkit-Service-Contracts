@@ -1,5 +1,7 @@
 package com.bukkit.epuidokas.ServiceContracts;
 
+import java.util.*;
+
 /**
  *
  * @author ep
@@ -22,7 +24,7 @@ public class ServiceContractsCommand {
         plugin = instance;
         String[] command_parts = command.split(" ", 10);
         String action_str = (command_parts.length > 1) ?  command_parts[1] : "";
-
+        
         // Help
         if(action_str.contentEquals("-" + plugin.getString("COMMAND_HELP_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_HELP"))) {
             action = 0;
@@ -274,16 +276,16 @@ public class ServiceContractsCommand {
         return "";
     }
 
-    public String[] getCommandFormats() {
+    public ArrayList getCommandFormats() {
         return getCommandFormats(false);
     }
 
-    public String[] getCommandFormats(boolean full) {
-        String command_formats[] = {};
+    public ArrayList getCommandFormats(boolean full) {
+        ArrayList<String> command_formats = new ArrayList<String>();
         String command_format;
-        int i = 0;
+        int i = 1;
         while(!(command_format = getCommandFormat(i, full)).isEmpty()) {
-            command_formats[i] = command_format;
+            command_formats.add(command_format);
             i++;
         }
         return command_formats;

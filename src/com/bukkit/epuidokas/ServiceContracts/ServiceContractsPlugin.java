@@ -59,7 +59,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
 
     public void onDisable() {
         PluginDescriptionFile pdfFile = this.getDescription();
-        log(" disabled");
+        log("disabled");
     }
 
     public String getString(String key) {
