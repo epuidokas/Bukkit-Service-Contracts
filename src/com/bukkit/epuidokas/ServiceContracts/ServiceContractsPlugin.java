@@ -21,11 +21,11 @@ import java.util.*;
  */
 public class ServiceContractsPlugin extends JavaPlugin {
 
-    private static iConomy iconomy = null;
-    private static PermissionHandler permissions = null;
+    private iConomy iConomy = null;
+    private PermissionHandler permissions = null;
     private final ServiceContractsContracts contracts = new ServiceContractsContracts(this);
-    private final ServiceContractsPlayerListener player_listener = new ServiceContractsPlayerListener(this);
-    private final ServiceContractsPluginListener plugin_listener = new ServiceContractsPluginListener(this);
+    private final ServiceContractsPlayerListener playerListener = new ServiceContractsPlayerListener(this);
+    private final ServiceContractsPluginListener pluginListener = new ServiceContractsPluginListener(this);
     private final Properties strings = new Properties();
 
     public void onEnable() {
@@ -49,9 +49,9 @@ public class ServiceContractsPlugin extends JavaPlugin {
 
         // Register our events
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, player_listener, Event.Priority.Low, this);
-        pm.registerEvent(Event.Type.PLAYER_INTERACT, player_listener, Event.Priority.Low, this);
-        pm.registerEvent(Event.Type.PLUGIN_ENABLE, plugin_listener, Event.Priority.Low, this);
+        pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Low, this);
+        pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Low, this);
+        pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Event.Priority.Low, this);
 
         // Load successful
         log("loaded");
@@ -106,13 +106,13 @@ public class ServiceContractsPlugin extends JavaPlugin {
         System.out.println("["+pdfFile.getName()+"]["+pdfFile.getVersion()+"] " + message);
     }
 
-    public iConomy getIconomy() {
-        return iconomy;
+    public iConomy getIConomy() {
+        return iConomy;
     }
 
-    public boolean setIconomy(iConomy instance) {
+    public boolean setIConomy(iConomy instance) {
         if (instance.isEnabled()) {
-            iconomy = instance;
+            iConomy = instance;
             log("successfully linked with iConomy");
             return true;
         }
@@ -135,6 +135,10 @@ public class ServiceContractsPlugin extends JavaPlugin {
             return false;
         }
 
+    }
+
+    public ServiceContractsContracts getContracts(){
+        return contracts;
     }
 
 }

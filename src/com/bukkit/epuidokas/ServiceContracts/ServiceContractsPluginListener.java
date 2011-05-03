@@ -21,10 +21,10 @@ public class ServiceContractsPluginListener extends ServerListener {
     public void onPluginEnable(PluginEnableEvent event) {
         
         // Link iConomy
-        if(plugin.getIconomy() == null) {
+        if(plugin.getIConomy() == null) {
             Plugin iconomy = plugin.getServer().getPluginManager().getPlugin("iConomy");
             if (iconomy != null) {
-                plugin.setIconomy((iConomy)iconomy);
+                plugin.setIConomy((iConomy)iconomy);
             }
         }
 

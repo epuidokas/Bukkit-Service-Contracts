@@ -17,7 +17,6 @@ public class ServiceContractsCommand {
     private int x = 0;
     private int z = 0;
     private String landmark = "";
-    private boolean valid = false;
 
     public ServiceContractsCommand(ServiceContractsPlugin instance, String command) throws Exception{
 
@@ -84,8 +83,32 @@ public class ServiceContractsCommand {
         return action;
     }
 
-    public boolean isValid() {
-        return valid;
+    public int getType() {
+        return type;
+    }
+
+    public int getOpenings() {
+        return openings;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public int getPayment() {
+        return payment;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getZ() {
+        return z;
+    }
+
+    public String getLandmark() {
+        return landmark;
     }
 
     private boolean parseType(String str) {
@@ -276,11 +299,11 @@ public class ServiceContractsCommand {
         return "";
     }
 
-    public ArrayList getCommandFormats() {
+    public ArrayList<String> getCommandFormats() {
         return getCommandFormats(false);
     }
 
-    public ArrayList getCommandFormats(boolean full) {
+    public ArrayList<String> getCommandFormats(boolean full) {
         ArrayList<String> command_formats = new ArrayList<String>();
         String command_format;
         int i = 1;
