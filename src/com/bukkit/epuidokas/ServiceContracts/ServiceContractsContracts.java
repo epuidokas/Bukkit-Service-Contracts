@@ -1,6 +1,5 @@
 package com.bukkit.epuidokas.ServiceContracts;
 
-import java.io.*;
 import java.util.*;
 
 /**
@@ -20,6 +19,11 @@ public class ServiceContractsContracts {
     }
 
     public boolean addContract(ServiceContractsContract contract) {
+        contracts.put(contract.getId(), contract);
         return true;
+    }
+
+    public ServiceContractsContract getContract(String id) {
+        return contracts.get(id);
     }
 }

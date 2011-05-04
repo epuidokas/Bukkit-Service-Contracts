@@ -1,6 +1,8 @@
 package com.bukkit.epuidokas.ServiceContracts;
 
+import java.util.*;
 import org.bukkit.entity.Player;
+import org.bukkit.block.Sign;
 import com.nijiko.coelho.iConomy.system.Account;
 
 /**
@@ -8,12 +10,17 @@ import com.nijiko.coelho.iConomy.system.Account;
  * @author ep
  */
 public class ServiceContractsContract {
-    
+
+    private final int PAY_INTERVAL = 5;
+
+    private final ServiceContractsPlugin plugin;
     private String id = null;
     private int action = 0;
     private int type = 0;
     private int openings = 0;
+    private int payPeriods = 0;
     private int length = 0;
+    private int payPerPeriod = 0;
     private int payment = 0;
     private int x = 0;
     private int z = 0;
@@ -21,32 +28,72 @@ public class ServiceContractsContract {
     private int signX = 0;
     private int signY = 0;
     private int signZ = 0;
+    private int money = 0;
+    private int potentialCost = 0;
+    private String employer = "";
+    private ArrayList<String> contractors;
 
-    public ServiceContractsContract(ServiceContractsPlugin plugin, Player player, ServiceContractsCommand command) throws Exception{
+    public ServiceContractsContract(ServiceContractsPlugin instance, Player player, ServiceContractsCommand command) throws Exception{
+        plugin = instance;
         type = command.getType();
         openings = command.getOpenings();
-        length = command.getLength();
-        payment = command.getPayment();
+        payPeriods = (int)command.getLength()/PAY_INTERVAL;
+        length = payPeriods*PAY_INTERVAL;
+        payPerPeriod = (int)command.getPayment()/payPeriods;
+        payment = payPerPeriod*payPeriods;
         x = command.getX();
         z = command.getZ();
+        employer = player.getName();
+        money = payment*openings;
+        
+        Account account = plugin.getIConomy().getBank().getAccount(employer);
 
-        Account account = plugin.getIConomy().getBank().getAccount(player.getName());
-
-        if(!account.hasEnough(payment*openings)) {
+        if(!account.hasEnough(money)) {
             openings = (int)account.getBalance()/payment;
             if (openings > 0) {
                 player.sendMessage(String.format(plugin.getString("MONEY_WARNING"), openings));
+                money = payment*openings;
             }
             else {
                 throw new Exception(String.format(plugin.getString("MONEY_ERROR")));
             }
         }
+        
+        account.subtract(money);
 
-        // @todo put their money somewhere safe
+    }
+
+    public boolean setId(Sign sign) {
+        return setId(sign.getX(),sign.getY(),sign.getZ());
     }
 
     public boolean setId(int x, int y, int z) {
-
+        signX = x;
+        signY = y;
+        signZ = z;
+        id = createId(x,y,z);
         return true;
+    }
+
+    public boolean pay(String contractorName) {
+        return pay(plugin.getServer().getPlayer(contractorName));
+    }
+
+    public boolean pay(Player contractor) {
+        String contractorName = contractor.getName();
+        if (!contractors.contains(contractorName))
+            return false;
+        Account account = plugin.getIConomy().getBank().getAccount(contractorName);
+        account.add(payPerPeriod);
+        money = money - payPerPeriod;
+        return true;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public static String createId(int x, int y, int z) {
+        return x + ":" + y + ":" + z;
     }
 }

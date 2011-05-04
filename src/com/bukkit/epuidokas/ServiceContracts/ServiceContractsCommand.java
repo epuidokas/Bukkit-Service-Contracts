@@ -28,7 +28,6 @@ public class ServiceContractsCommand {
         if(action_str.contentEquals("-" + plugin.getString("COMMAND_HELP_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_HELP"))) {
             action = 0;
         }
-
         // Create new contract posting
         else if(action_str.contentEquals("-" + plugin.getString("COMMAND_NEW_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_NEW"))) {
             action = 1;
@@ -45,7 +44,7 @@ public class ServiceContractsCommand {
                     throw new Exception(String.format(plugin.getString("INVALID_X"), command_parts[6], getCommandFormat(1)));
                 if (!parseZ(command_parts[7]))
                     throw new Exception(String.format(plugin.getString("INVALID_Z"), command_parts[7], getCommandFormat(1)));
-                if (command_parts[8] != null || !parseLandmark(command_parts[8]))
+                if (command_parts.length == 9 && !parseLandmark(command_parts[8]))
                     throw new Exception(String.format(plugin.getString("INVALID_LANDMARK"), command_parts[8], getCommandFormat(1)));
             }
             else {
@@ -112,19 +111,19 @@ public class ServiceContractsCommand {
     }
 
     private boolean parseType(String str) {
-        if ( str == "0" || str == plugin.getString("TYPE_DEMOLITION")) {
+        if ( str.contentEquals("0") || str.contentEquals(plugin.getString("TYPE_DEMOLITION"))) {
             type = 0;
         }
         // Build
-        else if(str == "1" || str == plugin.getString("TYPE_BUILD")) {
+        else if(str.contentEquals("1") || str.contentEquals(plugin.getString("TYPE_BUILD"))) {
             type = 1;
         }
         // Protection
-        else if(str == "2" || str == plugin.getString("TYPE_PROTECTION")) {
+        else if(str.contentEquals("2") || str.contentEquals(plugin.getString("TYPE_PROTECTION"))) {
             type = 2;
         }
         // Grief
-        else if(str == "3" || str == plugin.getString("TYPE_GRIEF")) {
+        else if(str.contentEquals("3") || str.contentEquals(plugin.getString("TYPE_GRIEF"))) {
             type = 3;
         }
         else {
