@@ -17,6 +17,7 @@ public class ServiceContractsCommand {
     private int x = 0;
     private int z = 0;
     private String landmark = "";
+    private String message = "";
 
     public ServiceContractsCommand(ServiceContractsPlugin instance, String command) throws Exception{
 
@@ -53,23 +54,28 @@ public class ServiceContractsCommand {
         }
 
         // Close contract posting
-        else if(action_str.contentEquals(plugin.getString("COMMAND_CLOSE_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_CLOSE"))) {
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_CLOSE_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_CLOSE"))) {
             action = 2;
         }
 
         // Open contract posting
-        else if(action_str.contentEquals(plugin.getString("COMMAND_OPEN_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_OPEN"))) {
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_OPEN_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_OPEN"))) {
             action = 3;
         }
 
         // Remove contract posting
-        else if(action_str.contentEquals(plugin.getString("COMMAND_REMOVE_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_REMOVE"))) {
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_REMOVE_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_REMOVE"))) {
             action = 4;
         }
 
         // Apply for a contract
-        else if(action_str.contentEquals(plugin.getString("COMMAND_APPLY_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_APPLY"))) {
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_APPLY_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_APPLY"))) {
             action = 5;
+            if (command_parts.length > 2) {
+                command_parts = command.split(" ", 3);
+                if (!parseMessage(command_parts[2]))
+                    throw new Exception(String.format(plugin.getString("INVALID_MESSAGE")));
+            }
         }
 
         // Command not recognized
@@ -110,20 +116,24 @@ public class ServiceContractsCommand {
         return landmark;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
     private boolean parseType(String str) {
-        if ( str.contentEquals("0") || str.contentEquals(plugin.getString("TYPE_DEMOLITION"))) {
+        if ( str.contentEquals("0") || str.contentEquals(plugin.getString("TYPE_0"))) {
             type = 0;
         }
         // Build
-        else if(str.contentEquals("1") || str.contentEquals(plugin.getString("TYPE_BUILD"))) {
+        else if(str.contentEquals("1") || str.contentEquals(plugin.getString("TYPE_1"))) {
             type = 1;
         }
         // Protection
-        else if(str.contentEquals("2") || str.contentEquals(plugin.getString("TYPE_PROTECTION"))) {
+        else if(str.contentEquals("2") || str.contentEquals(plugin.getString("TYPE_2"))) {
             type = 2;
         }
         // Grief
-        else if(str.contentEquals("3") || str.contentEquals(plugin.getString("TYPE_GRIEF"))) {
+        else if(str.contentEquals("3") || str.contentEquals(plugin.getString("TYPE_3"))) {
             type = 3;
         }
         else {
@@ -190,6 +200,11 @@ public class ServiceContractsCommand {
 
     private boolean parseLandmark(String str) {
         landmark = str;
+        return true;
+    }
+
+    private boolean parseMessage(String str) {
+        message = str;
         return true;
     }
 

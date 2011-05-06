@@ -39,6 +39,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
 
     private final ServiceContractsPlugin plugin;
     private HashMap<String,Integer> playerStates = new HashMap<String,Integer>();
+    private HashMap<String,String> playerStatesData = new HashMap<String,String>();
     private HashMap<String,ServiceContractsContract> newContracts = new HashMap<String,ServiceContractsContract>();
 
 
@@ -57,6 +58,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
             ServiceContractsCommand command = new ServiceContractsCommand(plugin, event.getMessage());
             Player player = event.getPlayer();
             switch(command.getAction()) {
+                // Help
                 case 0:
                     if (!plugin.getPermissions().has(player, PERMISSIONS_HELP)) {
                         player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_HELP));
@@ -67,6 +69,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         player.sendMessage(commands.get(i));
                     }
                     break;
+                // New
                 case 1:
                     if (!plugin.getPermissions().has(player, PERMISSIONS_NEW)) {
                         player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_NEW));
@@ -83,7 +86,14 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     break;
                 case 4:
                     break;
+                // Apply
                 case 5:
+                    ServiceContractsContract applyContract = plugin.getContracts().getContract(playerStatesData.get(player.getName()));
+                    Player employer = plugin.getServer().getPlayer(applyContract.getEmployer());
+                    // @todo l10n
+                    player.sendMessage("Application submitted!");
+                    employer.sendMessage(player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
+                    employer.sendMessage("To accept, type '/sc -e " + player.getName() + " " + applyContract.getId() + "'");
                     break;
             }
         }
@@ -104,23 +114,27 @@ public class ServiceContractsPlayerListener extends PlayerListener {
         if (playerStates.containsKey(playerName))
             playerState = playerStates.get(playerName);
         switch(playerState) {
+            // New
             case 1:
                 // @todo verify this clicked block is a valid place to add the contract
                 ServiceContractsContract newContract = newContracts.get(playerName);
                 newContract.setId(sign);
+                newContract.drawSign(sign);
                 plugin.getContracts().addContract(newContract);
                 newContracts.remove(playerName);
                 playerStates.remove(playerName);
                 player.sendMessage(plugin.getString("CONTRACT_CREATED"));
                 break;
+            // No state (applying)
             default:
                 String id = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
                 plugin.log(id);
                 ServiceContractsContract contract = plugin.getContracts().getContract(id);
                 if(contract instanceof ServiceContractsContract) {
-                    // @todo get the '/sc -a' command from the ServiceContractsCommand class
+                    // @todo get the '/sc -a' string from the ServiceContractsCommand class
                     player.sendMessage(String.format(plugin.getString("APPLY"),"/sc -a"));
                     playerStates.put(playerName, 2);
+                    playerStatesData.put(playerName, id);
                 }
         }
 

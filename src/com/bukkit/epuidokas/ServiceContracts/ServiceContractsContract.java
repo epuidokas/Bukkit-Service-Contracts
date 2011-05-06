@@ -96,4 +96,29 @@ public class ServiceContractsContract {
     public static String createId(int x, int y, int z) {
         return x + ":" + y + ":" + z;
     }
+
+    public boolean drawSign(final Sign sign) {
+        // @todo proper l10n
+        sign.setLine(0, plugin.getString("TYPE_" + this.type));
+        sign.setLine(1, (this.landmark.isEmpty()) ? this.x + "," + this.z : "-near " + this.landmark + "-");
+        sign.setLine(2, this.payment + "c/" + this.length + "min");
+        sign.setLine(3, this.openings + " opening(s)");
+
+        // Force update of sign text
+        this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+            public void run() {
+                sign.update();
+            }
+        });
+        
+        return true;
+    }
+
+    public String getEmployer() {
+        return employer;
+    }
+
+    public int getType() {
+        return type;
+    }
 }
