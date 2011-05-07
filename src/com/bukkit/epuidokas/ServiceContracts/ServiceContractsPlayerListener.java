@@ -91,6 +91,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     ServiceContractsContract applyContract = plugin.getContracts().getContract(playerStatesData.get(player.getName()));
                     Player employer = plugin.getServer().getPlayer(applyContract.getEmployer());
                     // @todo l10n
+                    // @todo actually do something with the applicant's message
                     player.sendMessage("Application submitted!");
                     employer.sendMessage(player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
                     employer.sendMessage("To accept, type '/sc -e " + player.getName() + " " + applyContract.getId() + "'");

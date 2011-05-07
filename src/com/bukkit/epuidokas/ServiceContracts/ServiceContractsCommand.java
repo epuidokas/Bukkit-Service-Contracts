@@ -78,6 +78,42 @@ public class ServiceContractsCommand {
             }
         }
 
+        // Hire applicant
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_EMPLOY_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_EMPLOY"))) {
+            action = 6;
+        }
+
+        // Fire contractor
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_FIRE_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_FIRE"))) {
+            action = 7;
+        }
+
+        // Start paying contractor
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_START_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_START"))) {
+            action = 8;
+        }
+
+        // Pause paying contractor
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_PAUSE_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_PAUSE"))) {
+            action = 9;
+        }
+
+        // Quit current contract
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_QUIT_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_QUIT"))) {
+            action = 10;
+        }
+
+        // Modify contract
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_MODIFY_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_MODIFY"))) {
+            action = 11;
+        }
+
+        // Get info on contract
+        else if(action_str.contentEquals("-" + plugin.getString("COMMAND_INFO_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_INFO"))) {
+            action = 12;
+        }
+
+
         // Command not recognized
         else {
             throw new Exception(String.format(plugin.getString("INVALID_COMMAND"), getCommandFormat(0)));
