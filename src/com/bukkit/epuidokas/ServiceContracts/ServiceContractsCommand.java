@@ -83,8 +83,7 @@ public class ServiceContractsCommand {
         // Hire applicant
         else if(action_str.contentEquals("-" + plugin.getString("COMMAND_EMPLOY_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_EMPLOY"))) {
             action = 6;
-            if (command_parts.length > 2) {
-                command_parts = command.split(" ", 3);
+            if (command_parts.length == 4) {
                 if (!parseContract(command_parts[2]))
                     throw new Exception(String.format(plugin.getString("INVALID_CONTRACT")));
                 if (!parsePlayer(command_parts[3]))
@@ -95,16 +94,34 @@ public class ServiceContractsCommand {
         // Fire contractor
         else if(action_str.contentEquals("-" + plugin.getString("COMMAND_FIRE_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_FIRE"))) {
             action = 7;
+            if (command_parts.length == 4) {
+                if (!parseContract(command_parts[2]))
+                    throw new Exception(String.format(plugin.getString("INVALID_CONTRACT")));
+                if (!parsePlayer(command_parts[3]))
+                    throw new Exception(String.format(plugin.getString("INVALID_PLAYER")));
+            }
         }
 
         // Start paying contractor
         else if(action_str.contentEquals("-" + plugin.getString("COMMAND_START_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_START"))) {
             action = 8;
+            if (command_parts.length == 4) {
+                if (!parseContract(command_parts[2]))
+                    throw new Exception(String.format(plugin.getString("INVALID_CONTRACT")));
+                if (!parsePlayer(command_parts[3]))
+                    throw new Exception(String.format(plugin.getString("INVALID_PLAYER")));
+            }
         }
 
         // Pause paying contractor
         else if(action_str.contentEquals("-" + plugin.getString("COMMAND_PAUSE_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_PAUSE"))) {
             action = 9;
+            if (command_parts.length == 4) {
+                if (!parseContract(command_parts[2]))
+                    throw new Exception(String.format(plugin.getString("INVALID_CONTRACT")));
+                if (!parsePlayer(command_parts[3]))
+                    throw new Exception(String.format(plugin.getString("INVALID_PLAYER")));
+            }
         }
 
         // Quit current contract
@@ -170,7 +187,7 @@ public class ServiceContractsCommand {
     }
 
     public String getContract() {
-        return player;
+        return contract;
     }
 
     private boolean parseType(String str) {

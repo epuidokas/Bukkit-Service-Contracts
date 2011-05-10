@@ -97,13 +97,27 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     // @todo actually do something with the applicant's message
                     player.sendMessage("Application submitted!");
                     employer.sendMessage(player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
-                    employer.sendMessage("To accept, type '/sc -e " + player.getName() + " " + applyContract.getId() + "'");
+                    employer.sendMessage("To accept, type '/sc -e " + applyContract.getId() + " " + player.getName() + "'");
                     break;
                 // Employ
                 case 6:
+                    //plugin.log(command.getContract());
                     ServiceContractsContract employContract = plugin.getContracts().getContract(command.getContract());
+                    if (employContract == null) {
+                        // @todo l10n
+                        player.sendMessage("Contract specified is invalid");
+                        break;
+                    }
                     String contractorName = command.getPlayer();
+                    if (contractorName == null) {
+                        // @todo l10n
+                        player.sendMessage("Contractor name specified is invalid");
+                        break;
+                    }
+                    Player employEmployer = plugin.getServer().getPlayer(employContract.getEmployer());
                     employContract.addContractor(contractorName);
+                    // @todo l10n
+                    employEmployer.sendMessage("Type `/sc -s " + employContract.getId() + " " + contractorName + "` to start paying them.");
                     break;
                 // Fire
                 case 7:
@@ -114,8 +128,18 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                 // Start
                 case 8:
                     ServiceContractsContract startContract = plugin.getContracts().getContract(command.getContract());
+                    if (startContract == null) {
+                        // @todo l10n
+                        player.sendMessage("Contract specified is invalid: " + command.getContract());
+                        break;
+                    }
                     String startContractorName = command.getPlayer();
-                    // @TODO
+                    if (startContractorName == null) {
+                        // @todo l10n
+                        player.sendMessage("Contractor name specified is invalid");
+                        break;
+                    }
+                    startContract.startContractor(startContractorName);
                     break;
                 // Pause
                 case 9:
@@ -167,7 +191,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
             // No state (applying)
             default:
                 String id = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
-                plugin.log(id);
+                //plugin.log(id);
                 ServiceContractsContract contract = plugin.getContracts().getContract(id);
                 if(contract instanceof ServiceContractsContract) {
                     // @todo get the '/sc -a' string from the ServiceContractsCommand class

@@ -1,6 +1,7 @@
 package com.bukkit.epuidokas.ServiceContracts;
 
 import java.util.*;
+import java.lang.*;
 import org.bukkit.entity.Player;
 import org.bukkit.block.Sign;
 import com.nijiko.coelho.iConomy.system.Account;
@@ -31,7 +32,7 @@ public class ServiceContractsContract {
     private int money = 0;
     private int potentialCost = 0;
     private String employer = "";
-    private HashMap<String,Integer> contractors = new HashMap();
+    private HashMap<String,ServiceContractsContractor> contractors = new HashMap();
 
     public ServiceContractsContract(ServiceContractsPlugin instance, Player player, ServiceContractsCommand command) throws Exception{
         plugin = instance;
@@ -85,6 +86,8 @@ public class ServiceContractsContract {
             return false;
         Account account = plugin.getIConomy().getBank().getAccount(contractorName);
         account.add(payPerPeriod);
+        // @todo l10n
+        contractor.sendMessage("You just got paid " + payPerPeriod + "c!");
         money = money - payPerPeriod;
         return true;
     }
@@ -123,23 +126,13 @@ public class ServiceContractsContract {
     }
 
     public boolean addContractor(String contractorName){
-        contractors.put(contractorName, 0);
+        contractors.put(contractorName, new ServiceContractsContractor(plugin,contractorName,id));
         return true;
     }
 
-    public boolean logContractorWork(String contractorName, Integer time){
-        Integer prev = contractors.get(contractorName);
-        if (prev == null)
-            return false;
-        Integer newTime = prev + time;
-        contractors.put(contractorName, newTime);
-        if (newTime % PAY_INTERVAL == 0) {
-            if (!plugin.getServer().getPlayer(contractorName).isOnline()) {
-                pauseContractor(contractorName);
-                plugin.getServer().getPlayer(employer).sendMessage(String.format(plugin.getString("CONTRACTOR_OFFLINE"), contractorName));
-                return false;
-            }
-            pay(contractorName);
+    public boolean submitTimecard(String contractorName, Integer time){
+        if (time % PAY_INTERVAL == 0) {
+            return pay(contractorName);
         }
         return true;
     }
@@ -150,12 +143,16 @@ public class ServiceContractsContract {
     }
 
     public boolean pauseContractor(String contractorName){
-        // @TODO
+        if(!contractors.containsKey(contractorName))
+            return false;
+        contractors.get(contractorName).pause();
         return true;
     }
 
     public boolean startContractor(String contractorName){
-        // @TODO
+        if(!contractors.containsKey(contractorName))
+            return false;
+        contractors.get(contractorName).start();
         return true;
     }
 }
