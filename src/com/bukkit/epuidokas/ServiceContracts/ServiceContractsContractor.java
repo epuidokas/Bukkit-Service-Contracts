@@ -41,7 +41,7 @@ public class ServiceContractsContractor {
         Player player = plugin.getServer().getPlayer(playerName);
         if (!(player instanceof Player)) {
             plugin.log("Couldn't find player '" +playerName+ "' for contract '" +contractId+ "'; logWork failed");
-
+            return false;
         }
         if (!player.isOnline()){
             pause();
@@ -54,7 +54,14 @@ public class ServiceContractsContractor {
             plugin.log("Couldn't find contract '" +contractId+ "' for contractor '" +playerName+ "'");
             return false;
         }
-        plugin.getContracts().getContract(contractId).submitTimecard(playerName, time);
+        boolean log = plugin.getContracts().getContract(contractId).submitTimecard(playerName, time);
+
+        if(!log) {
+            player.sendMessage(plugin.getString("CONTRACTOR_PAY_FAILED"));
+            plugin.getServer().getPlayer(plugin.getContracts().getContract(contractId).getEmployer()).sendMessage(String.format(plugin.getString("EMPLOYER_PAY_FAILED"), playerName));
+            return false;
+        }
+
         return true;
     }
 

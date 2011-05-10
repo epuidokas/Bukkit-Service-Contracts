@@ -4,6 +4,7 @@ import java.util.*;
 import java.lang.*;
 import org.bukkit.entity.Player;
 import org.bukkit.block.Sign;
+import org.bukkit.block.Block;
 import com.nijiko.coelho.iConomy.system.Account;
 
 /**
@@ -45,7 +46,6 @@ public class ServiceContractsContract {
         x = command.getX();
         z = command.getZ();
         employer = player.getName();
-        money = payment*openings;
         
         Account account = plugin.getIConomy().getBank().getAccount(employer);
 
@@ -53,14 +53,11 @@ public class ServiceContractsContract {
             openings = (int)account.getBalance()/payment;
             if (openings > 0) {
                 player.sendMessage(String.format(plugin.getString("MONEY_WARNING"), openings));
-                money = payment*openings;
             }
             else {
                 throw new Exception(plugin.getString("MONEY_ERROR"));
             }
         }
-        
-        account.subtract(money);
 
     }
 
@@ -84,11 +81,17 @@ public class ServiceContractsContract {
         String contractorName = contractor.getName();
         if (!contractors.containsKey(contractorName))
             return false;
-        Account account = plugin.getIConomy().getBank().getAccount(contractorName);
-        account.add(payPerPeriod);
-        // @todo l10n
-        contractor.sendMessage("You just got paid " + payPerPeriod + "c!");
-        money = money - payPerPeriod;
+
+        Account employerAccount = plugin.getIConomy().getBank().getAccount(employer);
+        if(!employerAccount.hasEnough(payPerPeriod)) {
+            return false;
+        }
+
+        employerAccount.subtract(payPerPeriod);
+
+        Account contractorAccount = plugin.getIConomy().getBank().getAccount(contractorName);
+        contractorAccount.add(payPerPeriod);
+        contractor.sendMessage(String.format(plugin.getString("PAID"), payPerPeriod));
         return true;
     }
 
@@ -100,20 +103,28 @@ public class ServiceContractsContract {
         return x + ":" + y + ":" + z;
     }
 
-    public boolean drawSign(final Sign sign) {
-        // @todo proper l10n
-        sign.setLine(0, plugin.getString("TYPE_" + this.type));
-        sign.setLine(1, (this.landmark.isEmpty()) ? this.x + "," + this.z : "-near " + this.landmark + "-");
-        sign.setLine(2, this.payment + "c/" + this.length + "min");
-        sign.setLine(3, this.openings + " opening(s)");
+    public boolean drawSign() {
+        final Block block = plugin.getServer().getWorld("world").getBlockAt(signX, signY, signZ);
+        final Sign sign = (Sign)block.getState();
+        // @todo l10n
+        sign.setLine(0, plugin.getString("TYPE_" + type));
+        sign.setLine(1, (landmark.isEmpty()) ? x + "," + z : "-near " + landmark + "-");
+        sign.setLine(2, payment + "c/" + length + "min");
+        sign.setLine(3, openings + " opening(s)");
+        
+        updateSign();
+        
+        return true;
+    }
 
-        // Force update of sign text
-        this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+    private boolean updateSign(){
+        final Block block = plugin.getServer().getWorld("world").getBlockAt(signX, signY, signZ);
+        final Sign sign = (Sign)block.getState();
+        this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             public void run() {
                 sign.update();
             }
         });
-        
         return true;
     }
 
@@ -126,14 +137,23 @@ public class ServiceContractsContract {
     }
 
     public boolean addContractor(String contractorName){
+        if (openings < 1)
+            return false;
+        
+        Account account = plugin.getIConomy().getBank().getAccount(employer);
+        if (!account.hasEnough(payment)){
+            plugin.getServer().getPlayer(employer).sendMessage(plugin.getString("INSUFFICIENT_FUNDS"));
+            setOpenings(0);
+            return false;
+        }
         contractors.put(contractorName, new ServiceContractsContractor(plugin,contractorName,id));
+        openings--;
         return true;
     }
 
     public boolean submitTimecard(String contractorName, Integer time){
-        if (time % PAY_INTERVAL == 0) {
+        if (time % PAY_INTERVAL == 0)
             return pay(contractorName);
-        }
         return true;
     }
 
@@ -154,5 +174,14 @@ public class ServiceContractsContract {
             return false;
         contractors.get(contractorName).start();
         return true;
+    }
+
+    public boolean setOpenings(int num) {
+        openings = num;
+        return updateSign();
+    }
+
+    public int getOpenings() {
+        return openings;
     }
 }

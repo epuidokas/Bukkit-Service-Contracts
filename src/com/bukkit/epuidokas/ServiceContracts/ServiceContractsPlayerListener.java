@@ -93,11 +93,20 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                 case 5:
                     ServiceContractsContract applyContract = plugin.getContracts().getContract(playerStatesData.get(player.getName()));
                     Player employer = plugin.getServer().getPlayer(applyContract.getEmployer());
+                    if (!plugin.inDebugMode() && employer.getName() == player.getName()) {
+                        player.sendMessage(plugin.getString("EMPLOYER_APPLY"));
+                        break;
+                    }
                     // @todo l10n
                     // @todo actually do something with the applicant's message
-                    player.sendMessage("Application submitted!");
-                    employer.sendMessage(player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
-                    employer.sendMessage("To accept, type '/sc -e " + applyContract.getId() + " " + player.getName() + "'");
+                    if (applyContract.getOpenings() > 0) {
+                        player.sendMessage("Application submitted!");
+                        employer.sendMessage(player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
+                        employer.sendMessage("To accept, type '/sc -e " + applyContract.getId() + " " + player.getName() + "'");
+                    }
+                    else {
+                        player.sendMessage(plugin.getString("NO_OPENINGS"));
+                    }
                     break;
                 // Employ
                 case 6:
@@ -140,12 +149,15 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         break;
                     }
                     startContract.startContractor(startContractorName);
+                    player.sendMessage(String.format(plugin.getString("EMPLOYER_START_PAY"),startContractorName));
+                    plugin.getServer().getPlayer(startContractorName).sendMessage(plugin.getString("CONTRACTOR_START_PAY"));
                     break;
                 // Pause
                 case 9:
                     ServiceContractsContract pauseContract = plugin.getContracts().getContract(command.getContract());
                     String pauseContractorName = command.getPlayer();
                     // @TODO
+
                     break;
                 // Quit
                 case 10:
@@ -182,7 +194,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                 // @todo verify this clicked block is a valid place to add the contract
                 ServiceContractsContract newContract = newContracts.get(playerName);
                 newContract.setId(sign);
-                newContract.drawSign(sign);
+                newContract.drawSign();
                 plugin.getContracts().addContract(newContract);
                 newContracts.remove(playerName);
                 playerStates.remove(playerName);
@@ -194,10 +206,15 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                 //plugin.log(id);
                 ServiceContractsContract contract = plugin.getContracts().getContract(id);
                 if(contract instanceof ServiceContractsContract) {
-                    // @todo get the '/sc -a' string from the ServiceContractsCommand class
-                    player.sendMessage(String.format(plugin.getString("APPLY"),"/sc -a"));
-                    playerStates.put(playerName, 2);
-                    playerStatesData.put(playerName, id);
+                    if (contract.getOpenings() > 0) {
+                        // @todo get the '/sc -a' string from the ServiceContractsCommand class
+                        player.sendMessage(String.format(plugin.getString("APPLY"),"/sc -a"));
+                        playerStates.put(playerName, 2);
+                        playerStatesData.put(playerName, id);
+                    }
+                    else {
+                        player.sendMessage(plugin.getString("NO_OPENINGS"));
+                    }
                 }
         }
 

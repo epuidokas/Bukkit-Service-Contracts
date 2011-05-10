@@ -27,6 +27,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
     private final ServiceContractsPlayerListener playerListener = new ServiceContractsPlayerListener(this);
     private final ServiceContractsPluginListener pluginListener = new ServiceContractsPluginListener(this);
     private final Properties strings = new Properties();
+    private final boolean debugMode = true;
 
     public void onEnable() {
 
@@ -52,9 +53,13 @@ public class ServiceContractsPlugin extends JavaPlugin {
         pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Low, this);
         pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Low, this);
         pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Event.Priority.Low, this);
-        
+
         // Load successful
         log("loaded");
+    }
+
+    public boolean inDebugMode(){
+        return debugMode;
     }
 
     public void onDisable() {
