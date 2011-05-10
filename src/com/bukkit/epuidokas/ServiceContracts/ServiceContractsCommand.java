@@ -492,11 +492,10 @@ public class ServiceContractsCommand {
                                          plugin.getString("COMMAND_INFO_SHORT"));
                 }
                 else {
-                    return String.format("/%s -%s|%s [<%s>]",
+                    return String.format("/%s -%s|%s",
                                          plugin.getString("COMMAND"),
                                          plugin.getString("COMMAND_INFO_SHORT"),
-                                         plugin.getString("COMMAND_INFO"),
-                                         plugin.getString("INFO_COMMAND_CONTRACT"));
+                                         plugin.getString("COMMAND_INFO"));
                 }
         }
         return "";

@@ -169,7 +169,8 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     break;
                 // Info
                 case 12:
-                    // @TODO
+                    player.sendMessage("Please select a sign");
+                    playerStates.put(player.getName(),2);
                     break;
             }
         }
@@ -207,6 +208,11 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                 if(infoContract instanceof ServiceContractsContract) {
                     infoContract.sendInfoMessage(player);
                 }
+                else {
+                    // @todo l10n
+                    player.sendMessage("That is not a service contract sign");
+                }
+                playerStates.remove(playerName);
                 break;
             // No state (applying)
             default:
