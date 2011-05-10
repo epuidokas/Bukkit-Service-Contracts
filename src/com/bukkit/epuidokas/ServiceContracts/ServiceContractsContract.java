@@ -118,6 +118,7 @@ public class ServiceContractsContract {
     }
 
     private boolean updateSign(){
+        // @todo support multiple worlds
         final Block block = plugin.getServer().getWorld("world").getBlockAt(signX, signY, signZ);
         final Sign sign = (Sign)block.getState();
         this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -147,7 +148,7 @@ public class ServiceContractsContract {
             return false;
         }
         contractors.put(contractorName, new ServiceContractsContractor(plugin,contractorName,id));
-        openings--;
+        setOpenings(getOpenings()-1);
         return true;
     }
 
@@ -178,7 +179,7 @@ public class ServiceContractsContract {
 
     public boolean setOpenings(int num) {
         openings = num;
-        return updateSign();
+        return drawSign();
     }
 
     public int getOpenings() {
