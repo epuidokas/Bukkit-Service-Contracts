@@ -184,4 +184,13 @@ public class ServiceContractsContract {
     public int getOpenings() {
         return openings;
     }
+
+    public boolean sendInfoMessage(Player player){
+        // @todo
+        player.sendMessage(type + " contract offerd by " + employer);
+        player.sendMessage( payment + "c for " + length + "min of work");
+        player.sendMessage("Contract is located at " + x + "," + z);
+        player.sendMessage(openings + " opening(s) left");
+        return true;
+    }
 }

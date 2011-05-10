@@ -200,13 +200,23 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                 playerStates.remove(playerName);
                 player.sendMessage(plugin.getString("CONTRACT_CREATED"));
                 break;
+            // Info
+            case 2:
+                String infoId = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
+                ServiceContractsContract infoContract = plugin.getContracts().getContract(infoId);
+                if(infoContract instanceof ServiceContractsContract) {
+                    infoContract.sendInfoMessage(player);
+                }
+                break;
             // No state (applying)
             default:
                 String id = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
-                //plugin.log(id);
                 ServiceContractsContract contract = plugin.getContracts().getContract(id);
                 if(contract instanceof ServiceContractsContract) {
-                    if (contract.getOpenings() > 0) {
+                    if (!plugin.inDebugMode() && contract.getEmployer() == player.getName()) {
+                        contract.sendInfoMessage(player);
+                    }
+                    else if(contract.getOpenings() > 0) {
                         // @todo get the '/sc -a' string from the ServiceContractsCommand class
                         player.sendMessage(String.format(plugin.getString("APPLY"),"/sc -a"));
                         playerStates.put(playerName, 2);
