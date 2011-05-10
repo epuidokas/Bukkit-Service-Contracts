@@ -8,6 +8,9 @@ import org.bukkit.entity.Player;
  * @author ep
  */
 public class ServiceContractsContractor {
+
+    private final int NUM_OF_SEC_PER_MIN = 5;
+
     private final String playerName;
     private final String contractId;
     private final ServiceContractsPlugin plugin;
@@ -25,7 +28,7 @@ public class ServiceContractsContractor {
             public void run() {
                 logWork();
             }
-        }, 20*10, 20*10);
+        }, 20*NUM_OF_SEC_PER_MIN, 20*NUM_OF_SEC_PER_MIN);
         return true;
     }
 
