@@ -31,7 +31,7 @@ public class ServiceContractsContract {
     private int money = 0;
     private int potentialCost = 0;
     private String employer = "";
-    private ArrayList<String> contractors;
+    private HashMap<String,Integer> contractors = new HashMap();
 
     public ServiceContractsContract(ServiceContractsPlugin instance, Player player, ServiceContractsCommand command) throws Exception{
         plugin = instance;
@@ -55,7 +55,7 @@ public class ServiceContractsContract {
                 money = payment*openings;
             }
             else {
-                throw new Exception(String.format(plugin.getString("MONEY_ERROR")));
+                throw new Exception(plugin.getString("MONEY_ERROR"));
             }
         }
         
@@ -75,13 +75,13 @@ public class ServiceContractsContract {
         return true;
     }
 
-    public boolean pay(String contractorName) {
+    private boolean pay(String contractorName) {
         return pay(plugin.getServer().getPlayer(contractorName));
     }
 
-    public boolean pay(Player contractor) {
+    private boolean pay(Player contractor) {
         String contractorName = contractor.getName();
-        if (!contractors.contains(contractorName))
+        if (!contractors.containsKey(contractorName))
             return false;
         Account account = plugin.getIConomy().getBank().getAccount(contractorName);
         account.add(payPerPeriod);
@@ -120,5 +120,36 @@ public class ServiceContractsContract {
 
     public int getType() {
         return type;
+    }
+
+    public boolean addContractor(String contractorName){
+        contractors.put(contractorName, 0);
+        return true;
+    }
+
+    public boolean logContractorWork(String contractorName, Integer time){
+        Integer prev = contractors.get(contractorName);
+        if (prev == null)
+            return false;
+        Integer newTime = prev + time;
+        contractors.put(contractorName, newTime);
+        if (newTime % PAY_INTERVAL == 0)
+            pay(contractorName);
+        return true;
+    }
+
+    public boolean removeContractor(String contractorName){
+        contractors.remove(contractorName);
+        return true;
+    }
+
+    public boolean pauseContractor(String contractorName){
+        // @TODO
+        return true;
+    }
+
+    public boolean startContractor(String contractorName){
+        // @TODO
+        return true;
     }
 }

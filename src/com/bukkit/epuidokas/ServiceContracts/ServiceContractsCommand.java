@@ -18,6 +18,8 @@ public class ServiceContractsCommand {
     private int z = 0;
     private String landmark = "";
     private String message = "";
+    private String player = "";
+    private String contract = "";
 
     public ServiceContractsCommand(ServiceContractsPlugin instance, String command) throws Exception{
 
@@ -81,6 +83,13 @@ public class ServiceContractsCommand {
         // Hire applicant
         else if(action_str.contentEquals("-" + plugin.getString("COMMAND_EMPLOY_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_EMPLOY"))) {
             action = 6;
+            if (command_parts.length > 2) {
+                command_parts = command.split(" ", 3);
+                if (!parseContract(command_parts[2]))
+                    throw new Exception(String.format(plugin.getString("INVALID_CONTRACT")));
+                if (!parsePlayer(command_parts[3]))
+                    throw new Exception(String.format(plugin.getString("INVALID_PLAYER")));
+            }
         }
 
         // Fire contractor
@@ -154,6 +163,14 @@ public class ServiceContractsCommand {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getPlayer() {
+        return player;
+    }
+
+    public String getContract() {
+        return player;
     }
 
     private boolean parseType(String str) {
@@ -244,6 +261,16 @@ public class ServiceContractsCommand {
         return true;
     }
 
+    private boolean parsePlayer(String str) {
+        player = str;
+        return true;
+    }
+
+    private boolean parseContract(String str) {
+        contract = str;
+        return true;
+    }
+
     public String getCommandFormat() {
         return getCommandFormat(action, false);
     }
@@ -258,6 +285,7 @@ public class ServiceContractsCommand {
 
     public String getCommandFormat(int action_val, boolean full) {
         switch(action_val){
+            // HELP
             case 0:
                 if (!full) {
                     return String.format("/%s -%s",
@@ -271,6 +299,7 @@ public class ServiceContractsCommand {
                                          plugin.getString("COMMAND_HELP"),
                                          plugin.getString("HELP_COMMAND_ACTION"));
                 }
+            // NEW
             case 1:
                 if (!full) {
                     return String.format("/%s -%s <%s> <%s> <%s> <%s> <%s> <%s>",
@@ -296,6 +325,7 @@ public class ServiceContractsCommand {
                                          plugin.getString("NEW_COMMAND_Z"),
                                          plugin.getString("NEW_COMMAND_LANDMARK"));
                 }
+            // CLOSE
             case 2:
                 if (!full) {
                     return String.format("/%s -%s",
@@ -308,6 +338,7 @@ public class ServiceContractsCommand {
                                          plugin.getString("COMMAND_CLOSE_SHORT"),
                                          plugin.getString("COMMAND_CLOSE"));
                 }
+            // OPEN
             case 3:
                 if (!full) {
                     return String.format("/%s -%s",
@@ -320,6 +351,7 @@ public class ServiceContractsCommand {
                                          plugin.getString("COMMAND_OPEN_SHORT"),
                                          plugin.getString("COMMAND_OPEN"));
                 }
+            // REMOVE
             case 4:
                 if (!full) {
                     return String.format("/%s -%s",
@@ -332,6 +364,7 @@ public class ServiceContractsCommand {
                                          plugin.getString("COMMAND_REMOVE_SHORT"),
                                          plugin.getString("COMMAND_REMOVE"));
                 }
+            // APPLY
             case 5:
                 if (!full) {
                     return String.format("/%s -%s",
@@ -344,6 +377,109 @@ public class ServiceContractsCommand {
                                          plugin.getString("COMMAND_APPLY_SHORT"),
                                          plugin.getString("COMMAND_APPLY"),
                                          plugin.getString("APPLY_COMMAND_MESSAGE"));
+                }
+            // EMPLOY
+            case 6:
+                if (!full) {
+                    return String.format("/%s -%s",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_EMPLOY_SHORT"));
+                }
+                else {
+                    return String.format("/%s -%s|%s <%s> <%s>",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_EMPLOY_SHORT"),
+                                         plugin.getString("COMMAND_EMPLOY"),
+                                         plugin.getString("EMPLOY_COMMAND_CONTRACT"),
+                                         plugin.getString("EMPLOY_COMMAND_PLAYER"));
+                }
+            // FIRE
+            case 7:
+                if (!full) {
+                    return String.format("/%s -%s",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_FIRE_SHORT"));
+                }
+                else {
+                    return String.format("/%s -%s|%s <%s> <%s>",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_FIRE_SHORT"),
+                                         plugin.getString("COMMAND_FIRE"),
+                                         plugin.getString("FIRE_COMMAND_CONTRACT"),
+                                         plugin.getString("FIRE_COMMAND_PLAYER"));
+                }
+            // START
+            case 8:
+                if (!full) {
+                    return String.format("/%s -%s",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_START_SHORT"));
+                }
+                else {
+                    return String.format("/%s -%s|%s <%s> <%s>",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_START_SHORT"),
+                                         plugin.getString("COMMAND_START"),
+                                         plugin.getString("START_COMMAND_CONTRACT"),
+                                         plugin.getString("START_COMMAND_PLAYER"));
+                }
+            // PAUSE
+            case 9:
+                if (!full) {
+                    return String.format("/%s -%s",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_PAUSE_SHORT"));
+                }
+                else {
+                    return String.format("/%s -%s|%s <%s> <%s>",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_PAUSE_SHORT"),
+                                         plugin.getString("COMMAND_PAUSE"),
+                                         plugin.getString("PAUSE_COMMAND_CONTRACT"),
+                                         plugin.getString("PAUSE_COMMAND_PLAYER"));
+                }
+            // QUIT
+            case 10:
+                if (!full) {
+                    return String.format("/%s -%s",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_QUIT_SHORT"));
+                }
+                else {
+                    return String.format("/%s -%s|%s",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_QUIT_SHORT"),
+                                         plugin.getString("COMMAND_QUIT"));
+                }
+            // MODIFY
+            case 11:
+                if (!full) {
+                    return String.format("/%s -%s",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_MODIFY_SHORT"));
+                }
+                else {
+                    return String.format("/%s -%s|%s <%s> <%s> <%s>",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_MODIFY_SHORT"),
+                                         plugin.getString("COMMAND_MODIFY"),
+                                         plugin.getString("MODIFY_COMMAND_NUM_OPENINGS"),
+                                         plugin.getString("MODIFY_COMMAND_LENGTH"),
+                                         plugin.getString("MODIFY_COMMAND_PAYMENT"));
+                }
+            // INFO
+            case 12:
+                if (!full) {
+                    return String.format("/%s -%s",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_INFO_SHORT"));
+                }
+                else {
+                    return String.format("/%s -%s|%s [<%s>]",
+                                         plugin.getString("COMMAND"),
+                                         plugin.getString("COMMAND_INFO_SHORT"),
+                                         plugin.getString("COMMAND_INFO"),
+                                         plugin.getString("INFO_COMMAND_CONTRACT"));
                 }
         }
         return "";

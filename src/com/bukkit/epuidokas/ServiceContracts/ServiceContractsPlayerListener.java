@@ -80,10 +80,13 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     playerStates.put(player.getName(), 1);
                     player.sendMessage(plugin.getString("SELECT_SIGN"));
                     break;
+                // Close
                 case 2:
                     break;
+                // Open
                 case 3:
                     break;
+                // Remove
                 case 4:
                     break;
                 // Apply
@@ -96,10 +99,45 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     employer.sendMessage(player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
                     employer.sendMessage("To accept, type '/sc -e " + player.getName() + " " + applyContract.getId() + "'");
                     break;
+                // Employ
+                case 6:
+                    ServiceContractsContract employContract = plugin.getContracts().getContract(command.getContract());
+                    String contractorName = command.getPlayer();
+                    employContract.addContractor(contractorName);
+                    break;
+                // Fire
+                case 7:
+                    ServiceContractsContract fireContract = plugin.getContracts().getContract(command.getContract());
+                    String fireContractorName = command.getPlayer();
+                    fireContract.removeContractor(fireContractorName);
+                    break;
+                // Start
+                case 8:
+                    ServiceContractsContract startContract = plugin.getContracts().getContract(command.getContract());
+                    String startContractorName = command.getPlayer();
+                    // @TODO
+                    break;
+                // Pause
+                case 9:
+                    ServiceContractsContract pauseContract = plugin.getContracts().getContract(command.getContract());
+                    String pauseContractorName = command.getPlayer();
+                    // @TODO
+                    break;
+                // Quit
+                case 10:
+                    // @TODO
+                    break;
+                // Modify
+                case 11:
+                    // @TODO
+                    break;
+                // Info
+                case 12:
+                    // @TODO
+                    break;
             }
         }
         catch(Exception e) {
-            //event.getPlayer().sendMessage(e.toString());
             event.getPlayer().sendMessage(e.getMessage());
         }
     }
