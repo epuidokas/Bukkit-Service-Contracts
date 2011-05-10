@@ -133,8 +133,14 @@ public class ServiceContractsContract {
             return false;
         Integer newTime = prev + time;
         contractors.put(contractorName, newTime);
-        if (newTime % PAY_INTERVAL == 0)
+        if (newTime % PAY_INTERVAL == 0) {
+            if (!plugin.getServer().getPlayer(contractorName).isOnline()) {
+                pauseContractor(contractorName);
+                plugin.getServer().getPlayer(employer).sendMessage(String.format(plugin.getString("CONTRACTOR_OFFLINE"), contractorName));
+                return false;
+            }
             pay(contractorName);
+        }
         return true;
     }
 
