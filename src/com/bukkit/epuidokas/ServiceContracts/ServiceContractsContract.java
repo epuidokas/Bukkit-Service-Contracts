@@ -159,6 +159,7 @@ public class ServiceContractsContract {
     }
 
     public boolean removeContractor(String contractorName){
+        contractors.get(contractorName).pause();
         contractors.remove(contractorName);
         return true;
     }

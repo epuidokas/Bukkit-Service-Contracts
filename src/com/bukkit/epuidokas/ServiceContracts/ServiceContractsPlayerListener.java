@@ -113,14 +113,12 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     //plugin.log(command.getContract());
                     ServiceContractsContract employContract = plugin.getContracts().getContract(command.getContract());
                     if (employContract == null) {
-                        // @todo l10n
-                        player.sendMessage("Contract specified is invalid");
+                        player.sendMessage(plugin.getString("INVALID_CONTRACT"));
                         break;
                     }
                     String contractorName = command.getPlayer();
                     if (contractorName == null) {
-                        // @todo l10n
-                        player.sendMessage("Contractor name specified is invalid");
+                        player.sendMessage(plugin.getString("INVALID_CONTRACTOR"));
                         break;
                     }
                     Player employEmployer = plugin.getServer().getPlayer(employContract.getEmployer());
@@ -131,21 +129,27 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                 // Fire
                 case 7:
                     ServiceContractsContract fireContract = plugin.getContracts().getContract(command.getContract());
+                    if (fireContract == null) {
+                        player.sendMessage(plugin.getString("INVALID_CONTRACT"));
+                        break;
+                    }
                     String fireContractorName = command.getPlayer();
+                    if (fireContractorName == null) {
+                        player.sendMessage(plugin.getString("INVALID_CONTRACTOR"));
+                        break;
+                    }
                     fireContract.removeContractor(fireContractorName);
                     break;
                 // Start
                 case 8:
                     ServiceContractsContract startContract = plugin.getContracts().getContract(command.getContract());
                     if (startContract == null) {
-                        // @todo l10n
-                        player.sendMessage("Contract specified is invalid: " + command.getContract());
+                        player.sendMessage(plugin.getString("INVALID_CONTRACT"));
                         break;
                     }
                     String startContractorName = command.getPlayer();
                     if (startContractorName == null) {
-                        // @todo l10n
-                        player.sendMessage("Contractor name specified is invalid");
+                        player.sendMessage(plugin.getString("INVALID_CONTRACTOR"));
                         break;
                     }
                     startContract.startContractor(startContractorName);
