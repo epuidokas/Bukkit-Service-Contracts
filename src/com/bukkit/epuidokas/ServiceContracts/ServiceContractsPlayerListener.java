@@ -122,7 +122,10 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         break;
                     }
                     Player employEmployer = plugin.getServer().getPlayer(employContract.getEmployer());
-                    employContract.addContractor(contractorName);
+                    if (!employContract.addContractor(contractorName)) {
+                        player.sendMessage(String.format(plugin.getString("EMPLOYER_EMPLOY_ERROR"), contractorName));
+                        break;
+                    }
                     // @todo l10n
                     employEmployer.sendMessage("Type `/sc -s " + employContract.getId() + " " + contractorName + "` to start paying them.");
                     break;
@@ -138,7 +141,12 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         player.sendMessage(plugin.getString("INVALID_CONTRACTOR"));
                         break;
                     }
-                    fireContract.removeContractor(fireContractorName);
+                    if (!fireContract.removeContractor(fireContractorName)) {
+                        player.sendMessage(String.format(plugin.getString("EMPLOYER_FIRED_ERROR"), fireContractorName));
+                        break;
+                    }
+                    player.sendMessage(String.format(plugin.getString("EMPLOYER_FIRED"), fireContractorName));
+                    plugin.getServer().getPlayer(fireContractorName).sendMessage(String.format(plugin.getString("CONTRACTOR_FIRED"), fireContractorName));
                     break;
                 // Start
                 case 8:
@@ -152,15 +160,31 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         player.sendMessage(plugin.getString("INVALID_CONTRACTOR"));
                         break;
                     }
-                    startContract.startContractor(startContractorName);
+                    if (!startContract.startContractor(startContractorName)) {
+                        player.sendMessage(String.format(plugin.getString("EMPLOYER_START_ERROR"), startContractorName));
+                        break;
+                    }
                     player.sendMessage(String.format(plugin.getString("EMPLOYER_START_PAY"),startContractorName));
                     plugin.getServer().getPlayer(startContractorName).sendMessage(plugin.getString("CONTRACTOR_START_PAY"));
                     break;
                 // Pause
                 case 9:
                     ServiceContractsContract pauseContract = plugin.getContracts().getContract(command.getContract());
+                    if (pauseContract == null) {
+                        player.sendMessage(plugin.getString("INVALID_CONTRACT"));
+                        break;
+                    }
                     String pauseContractorName = command.getPlayer();
-                    // @TODO
+                    if (pauseContractorName == null) {
+                        player.sendMessage(plugin.getString("INVALID_CONTRACTOR"));
+                        break;
+                    }
+                    if (!pauseContract.pauseContractor(pauseContractorName)) {
+                        player.sendMessage(String.format(plugin.getString("EMPLOYER_PAUSE_ERROR"), pauseContractorName));
+                        break;
+                    }
+                    player.sendMessage(String.format(plugin.getString("EMPLOYER_PAUSE_PAY"),pauseContractorName));
+                    plugin.getServer().getPlayer(pauseContractorName).sendMessage(plugin.getString("CONTRACTOR_PAUSE_PAY"));
 
                     break;
                 // Quit
@@ -173,6 +197,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     break;
                 // Info
                 case 12:
+                    // @todo l10n
                     player.sendMessage("Please select a sign");
                     playerStates.put(player.getName(),2);
                     break;
@@ -180,6 +205,10 @@ public class ServiceContractsPlayerListener extends PlayerListener {
         }
         catch(Exception e) {
             event.getPlayer().sendMessage(e.getMessage());
+            if (e.getMessage().isEmpty()){
+                plugin.log("An error has occured. Player:" + event.getPlayer().getName() + " Command:" + event.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 

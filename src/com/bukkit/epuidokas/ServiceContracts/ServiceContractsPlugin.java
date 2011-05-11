@@ -73,7 +73,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
 
     private void extractFile(String name) {
         File actual = new File(getDataFolder(), name);
-        if (!actual.exists()) {
+        if (!actual.exists()  || debugMode) {
             InputStream input = this.getClass().getResourceAsStream( name);
             if (input != null) {
                 FileOutputStream output = null;

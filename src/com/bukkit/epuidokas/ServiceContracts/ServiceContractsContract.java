@@ -138,8 +138,10 @@ public class ServiceContractsContract {
     }
 
     public boolean addContractor(String contractorName){
-        if (openings < 1)
+        if (openings < 1) {
+            plugin.getServer().getPlayer(employer).sendMessage(plugin.getString("NOT_ENOUGH_OPENINGS"));
             return false;
+        }
         
         Account account = plugin.getIConomy().getBank().getAccount(employer);
         if (!account.hasEnough(payment)){
@@ -159,6 +161,8 @@ public class ServiceContractsContract {
     }
 
     public boolean removeContractor(String contractorName){
+        if (!contractors.containsKey(contractorName))
+            return false;
         contractors.get(contractorName).pause();
         contractors.remove(contractorName);
         return true;
