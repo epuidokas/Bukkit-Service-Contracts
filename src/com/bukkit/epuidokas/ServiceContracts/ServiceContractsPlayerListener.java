@@ -82,6 +82,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     break;
                 // Close
                 case 2:
+
                     break;
                 // Open
                 case 3:
@@ -100,6 +101,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     // @todo l10n
                     // @todo actually do something with the applicant's message
                     if (applyContract.getOpenings() > 0) {
+                        applyContract.addApplicant(player.getName());
                         player.sendMessage("Application submitted!");
                         employer.sendMessage(player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
                         employer.sendMessage("To accept, type '/sc -e " + applyContract.getId() + " " + player.getName() + "'");
@@ -189,16 +191,24 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     break;
                 // Quit
                 case 10:
-                    // @TODO
+                    String quitContractorId = player.getName();
+                    String quitContractId = plugin.getContractByContractor(quitContractorId);
+                    ServiceContractsContract quitContract = plugin.getContracts().getContract(quitContractId);
+                    if (quitContract == null || !quitContract.removeContractor(quitContractorId)){
+                        player.sendMessage(plugin.getString("INVALID_CONTRACT"));
+                        break;
+                    }
+                    player.sendMessage(plugin.getString("CONTRACTOR_QUIT"));
+                    plugin.getServer().getPlayer(quitContract.getEmployer()).sendMessage(String.format(plugin.getString("EMPLOYER_QUIT"),quitContractorId));
                     break;
                 // Modify
                 case 11:
-                    // @TODO
+                    // @todo
+                    player.sendMessage("This command is not yet implemented. Please remove and create a new contract to make any modifications.");
                     break;
                 // Info
                 case 12:
-                    // @todo l10n
-                    player.sendMessage("Please select a sign");
+                    player.sendMessage(plugin.getString("SELECT_SIGN"));
                     playerStates.put(player.getName(),2);
                     break;
             }

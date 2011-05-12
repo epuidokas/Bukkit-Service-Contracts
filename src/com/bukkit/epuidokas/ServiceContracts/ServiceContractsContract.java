@@ -34,6 +34,7 @@ public class ServiceContractsContract {
     private int potentialCost = 0;
     private String employer = "";
     private HashMap<String,ServiceContractsContractor> contractors = new HashMap();
+    private ArrayList<String> applicants = new ArrayList();
 
     public ServiceContractsContract(ServiceContractsPlugin instance, Player player, ServiceContractsCommand command) throws Exception{
         plugin = instance;
@@ -142,6 +143,11 @@ public class ServiceContractsContract {
             plugin.getServer().getPlayer(employer).sendMessage(plugin.getString("NOT_ENOUGH_OPENINGS"));
             return false;
         }
+
+        if (!applicants.contains(contractorName)) {
+            plugin.getServer().getPlayer(employer).sendMessage(String.format(plugin.getString("NOT_AN_APPLICANT"), contractorName));
+            return false;
+        }
         
         Account account = plugin.getIConomy().getBank().getAccount(employer);
         if (!account.hasEnough(payment)){
@@ -150,6 +156,8 @@ public class ServiceContractsContract {
             return false;
         }
         contractors.put(contractorName, new ServiceContractsContractor(plugin,contractorName,id));
+        plugin.setContractByContractor(contractorName, id);
+        removeApplicant(contractorName);
         setOpenings(getOpenings()-1);
         return true;
     }
@@ -165,6 +173,7 @@ public class ServiceContractsContract {
             return false;
         contractors.get(contractorName).pause();
         contractors.remove(contractorName);
+        plugin.removeContractByContractor(contractorName);
         return true;
     }
 
@@ -192,11 +201,19 @@ public class ServiceContractsContract {
     }
 
     public boolean sendInfoMessage(Player player){
-        // @todo
+        // @todo l10n
         player.sendMessage(type + " contract offerd by " + employer);
         player.sendMessage( payment + "c for " + length + "min of work");
         player.sendMessage("Contract is located at " + x + "," + z);
         player.sendMessage(openings + " opening(s) left");
         return true;
+    }
+
+    public boolean addApplicant(String applicant) {
+        return (applicants.add(applicant) && plugin.addContractByApplicant(applicant, id));
+    }
+
+    public boolean removeApplicant(String applicant) {
+        return (applicants.remove(applicant) && plugin.removeApplicant(applicant));
     }
 }

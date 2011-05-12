@@ -24,6 +24,8 @@ public class ServiceContractsPlugin extends JavaPlugin {
     private iConomy iConomy = null;
     private PermissionHandler permissions = null;
     private final ServiceContractsContracts contracts = new ServiceContractsContracts(this);
+    private final HashMap<String,String> contractors = new HashMap();
+    private final HashMap<String,ArrayList<String>> applicants = new HashMap();
     private final ServiceContractsPlayerListener playerListener = new ServiceContractsPlayerListener(this);
     private final ServiceContractsPluginListener pluginListener = new ServiceContractsPluginListener(this);
     private final Properties strings = new Properties();
@@ -144,6 +146,39 @@ public class ServiceContractsPlugin extends JavaPlugin {
 
     public ServiceContractsContracts getContracts(){
         return contracts;
+    }
+
+    public String getContractByContractor(String contractor) {
+        return contractors.get(contractor);
+    }
+
+    public String setContractByContractor(String contractor, String contract) {
+        return contractors.put(contractor, contract);
+    }
+
+    public String removeContractByContractor(String contractor) {
+        return contractors.remove(contractor);
+    }
+
+    public ArrayList<String> getContractsByApplicant(String contractor) {
+        return applicants.get(contractor);
+    }
+
+    public boolean addContractByApplicant(String contractor, String contract) {
+        ArrayList<String> contracts = getContractsByApplicant(contractor);
+        if (contracts != null) {
+            contracts.add(contract);
+        }
+        else {
+            contracts = new ArrayList();
+        }
+        applicants.put(contractor, contracts);
+        return true;
+    }
+
+    public boolean removeApplicant(String contractor) {
+        applicants.remove(contractor);
+        return true;
     }
 
 }
