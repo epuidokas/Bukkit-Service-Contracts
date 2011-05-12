@@ -112,7 +112,6 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     break;
                 // Employ
                 case 6:
-                    //plugin.log(command.getContract());
                     ServiceContractsContract employContract = plugin.getContracts().getContract(command.getContract());
                     if (employContract == null) {
                         player.sendMessage(plugin.getString("INVALID_CONTRACT"));
@@ -128,6 +127,17 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         player.sendMessage(String.format(plugin.getString("EMPLOYER_EMPLOY_ERROR"), contractorName));
                         break;
                     }
+
+                    // Remove the contractor's applications for all other contracts
+                    ArrayList<String> applicantContracts = plugin.getContractsByApplicant(contractorName);
+                    ServiceContractsContracts allContracts = plugin.getContracts();
+                    for(int i=0;i<applicantContracts.size();i++)
+                    {
+                        ServiceContractsContract applicantContract = allContracts.getContract(applicantContracts.get(i));
+                        if (applicantContract instanceof ServiceContractsContract)
+                            applicantContract.removeApplicant(contractorName);
+                    }
+
                     // @todo l10n
                     employEmployer.sendMessage("Type `/sc -s " + employContract.getId() + " " + contractorName + "` to start paying them.");
                     break;
