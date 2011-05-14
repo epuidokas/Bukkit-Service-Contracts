@@ -57,16 +57,22 @@ public class ServiceContractsCommand {
 
         // Close contract posting
         else if(action_str.contentEquals("-" + plugin.getString("COMMAND_CLOSE_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_CLOSE"))) {
+            if (!parseContract(command_parts[2]))
+                throw new Exception(String.format(plugin.getString("INVALID_CONTRACT")));
             action = 2;
         }
 
         // Open contract posting
         else if(action_str.contentEquals("-" + plugin.getString("COMMAND_OPEN_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_OPEN"))) {
+            if (!parseContract(command_parts[2]))
+                throw new Exception(String.format(plugin.getString("INVALID_CONTRACT")));
             action = 3;
         }
 
         // Remove contract posting
         else if(action_str.contentEquals("-" + plugin.getString("COMMAND_REMOVE_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_REMOVE"))) {
+            if (!parseContract(command_parts[2]))
+                throw new Exception(String.format(plugin.getString("INVALID_CONTRACT")));
             action = 4;
         }
 

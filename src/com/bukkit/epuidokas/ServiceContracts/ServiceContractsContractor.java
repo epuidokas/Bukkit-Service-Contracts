@@ -15,7 +15,7 @@ public class ServiceContractsContractor {
     private final String contractId;
     private final ServiceContractsPlugin plugin;
     private Integer time = 0;
-    private Integer taskId;
+    private Integer taskId = null;
 
     public ServiceContractsContractor(ServiceContractsPlugin instance, String player, String contract){
         plugin = instance;
@@ -33,7 +33,8 @@ public class ServiceContractsContractor {
     }
 
     public boolean pause (){
-        plugin.getServer().getScheduler().cancelTask(taskId);
+        if (taskId != null)
+            plugin.getServer().getScheduler().cancelTask(taskId);
         return true;
     }
 

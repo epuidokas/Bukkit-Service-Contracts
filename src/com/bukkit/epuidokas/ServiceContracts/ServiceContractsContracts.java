@@ -23,6 +23,13 @@ public class ServiceContractsContracts {
         return true;
     }
 
+    public boolean removeContract(String contractId) {
+        ServiceContractsContract contract = getContract(contractId);
+        contract.removeAllContractors();
+        contracts.remove(contractId);
+        return true;
+    }
+
     public ServiceContractsContract getContract(String id) {
         return contracts.get(id);
     }

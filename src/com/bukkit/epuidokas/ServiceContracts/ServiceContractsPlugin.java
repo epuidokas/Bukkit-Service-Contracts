@@ -28,6 +28,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
     private final HashMap<String,ArrayList<String>> applicants = new HashMap();
     private final ServiceContractsPlayerListener playerListener = new ServiceContractsPlayerListener(this);
     private final ServiceContractsPluginListener pluginListener = new ServiceContractsPluginListener(this);
+    private final ServiceContractsBlockListener blockListener = new ServiceContractsBlockListener(this);
     private final Properties strings = new Properties();
     private final boolean debugMode = true;
 
@@ -53,6 +54,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
         // Register our events
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Low, this);
+        pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Event.Priority.Low, this);
         pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Low, this);
         pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Event.Priority.Low, this);
 

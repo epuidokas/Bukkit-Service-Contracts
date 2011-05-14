@@ -86,13 +86,31 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     break;
                 // Close
                 case 2:
-
+                    // @todo implement close
+                    player.sendMessage("This command is not yet implemented. Please remove your contract if you don't want anyone applying for it.");
                     break;
                 // Open
                 case 3:
+                    // @todo implement open
+                    player.sendMessage("This command is not yet implemented. You can't close it, so how could you possibly open?");
                     break;
                 // Remove
                 case 4:
+                    if (!plugin.getPermissions().has(player, PERMISSIONS_REMOVE)) {
+                        player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_REMOVE));
+                        break;
+                    }
+                    ServiceContractsContract removeContract = plugin.getContracts().getContract(command.getContract());
+                    if (removeContract == null) {
+                        player.sendMessage(plugin.getString("INVALID_CONTRACT"));
+                        break;
+                    }
+                    if (!removeContract.getEmployer().contentEquals(player.getName()) && !plugin.getPermissions().has(player, PERMISSIONS_REMOVE_ANY)) {
+                        player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_REMOVE_ANY));
+                        break;
+                    }
+                    plugin.getContracts().removeContract(removeContract.getId());
+                    player.sendMessage(String.format(plugin.getString("REMOVE_CONTRACT"), command.getContract()));
                     break;
                 // Apply
                 case 5:
@@ -100,19 +118,35 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_APPLY));
                         break;
                     }
-                    ServiceContractsContract applyContract = plugin.getContracts().getContract(playerStatesData.get(player.getName()));
+                    String playerStateData = playerStatesData.remove(player.getName());
+                    if (playerStateData == null) {
+                        player.sendMessage(plugin.getString("SELECT_CONTRACT_FIRST"));
+                        break;
+                    }
+                    ServiceContractsContract applyContract = plugin.getContracts().getContract(playerStateData);
                     Player employer = plugin.getServer().getPlayer(applyContract.getEmployer());
-                    if (!plugin.inDebugMode() && employer.getName() == player.getName()) {
+                    if (!plugin.inDebugMode() && employer.getName().contentEquals(player.getName())) {
                         player.sendMessage(plugin.getString("EMPLOYER_APPLY"));
+                        break;
+                    }
+                    if (plugin.getContractByContractor(player.getName()) != null) {
+                        // @todo l10n
+                        player.sendMessage("You're already employed!");
                         break;
                     }
                     // @todo l10n
                     // @todo actually do something with the applicant's message
                     if (applyContract.getOpenings() > 0) {
-                        applyContract.addApplicant(player.getName());
-                        player.sendMessage("Application submitted!");
-                        employer.sendMessage(player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
-                        employer.sendMessage("To accept, type '/sc -e " + applyContract.getId() + " " + player.getName() + "'");
+                        if (applyContract.hasApplicant(player.getName())) {
+                            // already applied
+                            player.sendMessage("You've already applied for this contract!");
+                        }
+                        else {
+                            applyContract.addApplicant(player.getName());
+                            player.sendMessage("Application submitted!");
+                            employer.sendMessage(player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
+                            employer.sendMessage("To accept, type '/sc -e " + applyContract.getId() + " " + player.getName() + "'");
+                        }
                     }
                     else {
                         player.sendMessage(plugin.getString("NO_OPENINGS"));
@@ -129,7 +163,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         player.sendMessage(plugin.getString("INVALID_CONTRACT"));
                         break;
                     }
-                    if (employContract.getEmployer() != player.getName() && !plugin.getPermissions().has(player, PERMISSIONS_EMPLOY_ANY)) {
+                    if (!employContract.getEmployer().contentEquals(player.getName()) && !plugin.getPermissions().has(player, PERMISSIONS_EMPLOY_ANY)) {
                         player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_EMPLOY_ANY));
                         break;  
                     }
@@ -147,13 +181,14 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     // Remove the contractor's applications for all other contracts
                     ArrayList<String> applicantContracts = plugin.getContractsByApplicant(contractorName);
                     ServiceContractsContracts allContracts = plugin.getContracts();
-                    for(int i=0;i<applicantContracts.size();i++)
-                    {
-                        ServiceContractsContract applicantContract = allContracts.getContract(applicantContracts.get(i));
-                        if (applicantContract instanceof ServiceContractsContract)
-                            applicantContract.removeApplicant(contractorName);
+                    if (applicantContracts instanceof ArrayList) {
+                        for(int i=0;i < applicantContracts.size();i++){
+                            player.sendMessage("foo" + i);
+                            ServiceContractsContract applicantContract = allContracts.getContract(applicantContracts.get(i));
+                            if (applicantContract instanceof ServiceContractsContract)
+                                applicantContract.removeApplicant(contractorName);
+                        }
                     }
-
                     // @todo l10n
                     employEmployer.sendMessage("Type `/sc -s " + employContract.getId() + " " + contractorName + "` to start paying them.");
                     break;
@@ -168,7 +203,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         player.sendMessage(plugin.getString("INVALID_CONTRACT"));
                         break;
                     }
-                    if (fireContract.getEmployer() != player.getName() && !plugin.getPermissions().has(player, PERMISSIONS_FIRE_ANY)) {
+                    if (!fireContract.getEmployer().contentEquals(player.getName()) && !plugin.getPermissions().has(player, PERMISSIONS_FIRE_ANY)) {
                         player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_FIRE_ANY));
                         break;  
                     }
@@ -195,7 +230,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         player.sendMessage(plugin.getString("INVALID_CONTRACT"));
                         break;
                     }
-                    if (startContract.getEmployer() != player.getName() && !plugin.getPermissions().has(player, PERMISSIONS_START_PAUSE_ANY)) {
+                    if (!startContract.getEmployer().contentEquals(player.getName()) && !plugin.getPermissions().has(player, PERMISSIONS_START_PAUSE_ANY)) {
                         player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_START_PAUSE_ANY));
                         break;  
                     }
@@ -222,7 +257,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         player.sendMessage(plugin.getString("INVALID_CONTRACT"));
                         break;
                     }
-                    if (pauseContract.getEmployer() != player.getName() && !plugin.getPermissions().has(player, PERMISSIONS_START_PAUSE_ANY)) {
+                    if (!pauseContract.getEmployer().contentEquals(player.getName()) && !plugin.getPermissions().has(player, PERMISSIONS_START_PAUSE_ANY)) {
                         player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_START_PAUSE_ANY));
                         break;  
                     }
@@ -278,10 +313,18 @@ public class ServiceContractsPlayerListener extends PlayerListener {
             }
         }
         catch(Exception e) {
-            event.getPlayer().sendMessage(e.getMessage());
-            if (e.getMessage().isEmpty()){
+            if (e.getMessage() != null) {
+                event.getPlayer().sendMessage(e.getMessage());
+            }
+            else{
                 plugin.log("An error has occured. Player:" + event.getPlayer().getName() + " Command:" + event.getMessage());
                 e.printStackTrace();
+                if (plugin.inDebugMode()){
+                    String[] stackTrace = e.toString().split("\\n");
+                    for (int i = 0; i<stackTrace.length;i++){
+                        plugin.getServer().broadcastMessage("Debug: " + stackTrace[i]);
+                    }
+                }
             }
         }
     }
@@ -331,8 +374,9 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     }
                     else if(contract.getOpenings() > 0) {
                         // @todo get the '/sc -a' string from the ServiceContractsCommand class
+                        contract.sendInfoMessage(player);
                         player.sendMessage(String.format(plugin.getString("APPLY"),"/sc -a"));
-                        playerStates.put(playerName, 2);
+                        playerStates.remove(playerName);
                         playerStatesData.put(playerName, id);
                     }
                     else {

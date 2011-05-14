@@ -177,6 +177,18 @@ public class ServiceContractsContract {
         return true;
     }
 
+    public boolean removeAllContractors(){
+        ServiceContractsContractor contractor;
+        for(String contractorId : contractors.keySet()) {
+            contractor = contractors.remove(contractorId);
+            contractor.pause();
+            plugin.removeContractByContractor(contractorId);
+            plugin.getServer().getPlayer(contractorId).sendMessage(String.format(plugin.getString("REMOVE_CONTRACT"), id));
+        }
+
+        return true;
+    }
+
     public boolean pauseContractor(String contractorName){
         if(!contractors.containsKey(contractorName))
             return false;
@@ -215,5 +227,9 @@ public class ServiceContractsContract {
 
     public boolean removeApplicant(String applicant) {
         return (applicants.remove(applicant) && plugin.removeApplicant(applicant));
+    }
+
+    public boolean hasApplicant(String applicant) {
+        return applicants.contains(applicant);
     }
 }
