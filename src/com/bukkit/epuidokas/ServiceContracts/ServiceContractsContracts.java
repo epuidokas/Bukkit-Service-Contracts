@@ -26,6 +26,7 @@ public class ServiceContractsContracts {
     public boolean removeContract(String contractId) {
         ServiceContractsContract contract = getContract(contractId);
         contract.removeAllContractors();
+        contract.removeSign();
         contracts.remove(contractId);
         return true;
     }

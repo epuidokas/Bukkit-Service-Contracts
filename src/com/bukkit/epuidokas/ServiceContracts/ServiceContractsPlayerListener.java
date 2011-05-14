@@ -86,16 +86,34 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     break;
                 // Close
                 case 2:
-                    // @todo implement close
-                    player.sendMessage("This command is not yet implemented. Please remove your contract if you don't want anyone applying for it.");
+                    player.sendMessage("CLOSE!!!");
+                    if (!plugin.getPermissions().has(player, PERMISSIONS_CLOSE) && !plugin.getPermissions().has(player, PERMISSIONS_CLOSE_ANY)) {
+                        player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_CLOSE));
+                        break;
+                    }
+                    player.sendMessage("CLOSE!!!");
+                    player.sendMessage(plugin.getString("SELECT_SIGN"));
+                    playerStates.put(player.getName(),3);
                     break;
                 // Open
                 case 3:
-                    // @todo implement open
-                    player.sendMessage("This command is not yet implemented. You can't close it, so how could you possibly open?");
+                    if (!plugin.getPermissions().has(player, PERMISSIONS_OPEN) && !plugin.getPermissions().has(player, PERMISSIONS_OPEN_ANY)) {
+                        player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_OPEN));
+                        break;
+                    }
+                    player.sendMessage(plugin.getString("SELECT_SIGN"));
+                    playerStates.put(player.getName(),4);
                     break;
                 // Remove
                 case 4:
+                    if (!plugin.getPermissions().has(player, PERMISSIONS_REMOVE) && !plugin.getPermissions().has(player, PERMISSIONS_REMOVE_ANY)) {
+                        player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_REMOVE));
+                        break;
+                    }
+                    player.sendMessage(plugin.getString("SELECT_SIGN"));
+                    playerStates.put(player.getName(),5);
+                    break;
+                    /*
                     if (!plugin.getPermissions().has(player, PERMISSIONS_REMOVE)) {
                         player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_REMOVE));
                         break;
@@ -112,6 +130,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     plugin.getContracts().removeContract(removeContract.getId());
                     player.sendMessage(String.format(plugin.getString("REMOVE_CONTRACT"), command.getContract()));
                     break;
+                     */
                 // Apply
                 case 5:
                     if (!plugin.getPermissions().has(player, PERMISSIONS_APPLY)) {
@@ -313,16 +332,33 @@ public class ServiceContractsPlayerListener extends PlayerListener {
             }
         }
         catch(Exception e) {
-            if (e.getMessage() != null) {
-                event.getPlayer().sendMessage(e.getMessage());
+            boolean actualError = true;
+            String errorString = e.getMessage();
+
+            // If the errorString only contains numbers, it's an actual error
+            if (errorString != null && errorString.length() != 0) {
+                for (int i = 0; i < errorString.length(); i++) {
+                    if (!Character.isDigit(errorString.charAt(i))) {
+                        actualError = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!actualError) {
+                event.getPlayer().sendMessage(errorString);
             }
             else{
                 plugin.log("An error has occured. Player:" + event.getPlayer().getName() + " Command:" + event.getMessage());
+                plugin.log(e.toString());
                 e.printStackTrace();
                 if (plugin.inDebugMode()){
-                    String[] stackTrace = e.toString().split("\\n");
-                    for (int i = 0; i<stackTrace.length;i++){
-                        plugin.getServer().broadcastMessage("Debug: " + stackTrace[i]);
+                    Writer result = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(result);
+                    e.printStackTrace(printWriter);
+                    String[] stackTrace = result.toString().split(System.getProperty("line.separator"));
+                    for (int i = 0; i<stackTrace.length && i<4;i++){
+                        plugin.getServer().broadcastMessage(stackTrace[i]);
                     }
                 }
             }
@@ -361,6 +397,45 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                 else {
                     // @todo l10n
                     player.sendMessage("That is not a service contract sign");
+                }
+                playerStates.remove(playerName);
+                break;
+            // Close
+            case 3:
+                String closeId = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
+                ServiceContractsContract closeContract = plugin.getContracts().getContract(closeId);
+                if(closeContract instanceof ServiceContractsContract && (closeContract.getEmployer().contentEquals(playerName) || plugin.getPermissions().has(player, PERMISSIONS_CLOSE_ANY))) {
+                    closeContract.disable();
+                }
+                else {
+                    // @todo l10n
+                    player.sendMessage("Close failed.");
+                }
+                playerStates.remove(playerName);
+                break;
+            // Open
+            case 4:
+                String openId = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
+                ServiceContractsContract openContract = plugin.getContracts().getContract(openId);
+                if(openContract instanceof ServiceContractsContract && (openContract.getEmployer().contentEquals(playerName)||plugin.getPermissions().has(player, PERMISSIONS_OPEN_ANY))) {
+                    openContract.enable();
+                }
+                else {
+                    // @todo l10n
+                    player.sendMessage("Open failed.");
+                }
+                playerStates.remove(playerName);
+                break;
+            // Remove
+            case 5:
+                String removeId = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
+                ServiceContractsContract removeContract = plugin.getContracts().getContract(removeId);
+                if(removeContract instanceof ServiceContractsContract && (removeContract.getEmployer().contentEquals(playerName)||plugin.getPermissions().has(player, PERMISSIONS_REMOVE_ANY))) {
+                    plugin.getContracts().removeContract(removeId);
+                }
+                else {
+                    // @todo l10n
+                    player.sendMessage("Remove failed.");
                 }
                 playerStates.remove(playerName);
                 break;

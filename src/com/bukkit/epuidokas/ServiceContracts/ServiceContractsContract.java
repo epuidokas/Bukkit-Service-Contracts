@@ -35,6 +35,7 @@ public class ServiceContractsContract {
     private String employer = "";
     private HashMap<String,ServiceContractsContractor> contractors = new HashMap();
     private ArrayList<String> applicants = new ArrayList();
+    private boolean enabled = true;
 
     public ServiceContractsContract(ServiceContractsPlugin instance, Player player, ServiceContractsCommand command) throws Exception{
         plugin = instance;
@@ -111,10 +112,24 @@ public class ServiceContractsContract {
         sign.setLine(0, plugin.getString("TYPE_" + type));
         sign.setLine(1, (landmark.isEmpty()) ? x + "," + z : "-near " + landmark + "-");
         sign.setLine(2, payment + "c/" + length + "min");
-        sign.setLine(3, openings + " opening(s)");
-        
+        if (enabled)
+            sign.setLine(3, "\u00A76" + getOpenings() + " opening(s)");
+        else
+            sign.setLine(3, "<Closed>");
+
         updateSign();
-        
+
+        return true;
+    }
+
+    public boolean removeSign() {
+        final Block block = plugin.getServer().getWorld("world").getBlockAt(signX, signY, signZ);
+        final Sign sign = (Sign)block.getState();
+        sign.setLine(0, "");
+        sign.setLine(1, "");
+        sign.setLine(2, "");
+        sign.setLine(3, "");
+        updateSign();
         return true;
     }
 
@@ -139,7 +154,7 @@ public class ServiceContractsContract {
     }
 
     public boolean addContractor(String contractorName){
-        if (openings < 1) {
+        if (getOpenings() < 1) {
             plugin.getServer().getPlayer(employer).sendMessage(plugin.getString("NOT_ENOUGH_OPENINGS"));
             return false;
         }
@@ -209,7 +224,10 @@ public class ServiceContractsContract {
     }
 
     public int getOpenings() {
-        return openings;
+        if (enabled)
+            return openings;
+        else
+            return 0;
     }
 
     public boolean sendInfoMessage(Player player){
@@ -217,7 +235,7 @@ public class ServiceContractsContract {
         player.sendMessage(type + " contract offerd by " + employer);
         player.sendMessage( payment + "c for " + length + "min of work");
         player.sendMessage("Contract is located at " + x + "," + z);
-        player.sendMessage(openings + " opening(s) left");
+        player.sendMessage(getOpenings() + " opening(s) left");
         return true;
     }
 
@@ -231,5 +249,19 @@ public class ServiceContractsContract {
 
     public boolean hasApplicant(String applicant) {
         return applicants.contains(applicant);
+    }
+
+    public boolean enable() {
+        enabled = true;
+        return drawSign();
+    }
+
+    public boolean disable() {
+        enabled = false;
+        return drawSign();
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 }
