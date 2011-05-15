@@ -295,10 +295,9 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_MODIFY));
                         break;
                     }
-                    
-                    
-                    // @todo implement modify
-                    player.sendMessage("This command is not yet implemented. Please remove and create a new contract to make any modifications.");
+                    player.sendMessage(plugin.getString("SELECT_SIGN"));
+                    playerStatesData.put(player.getName(), event.getMessage());
+                    playerStates.put(player.getName(),6);
                     break;
                 // Info
                 case 12:
@@ -312,36 +311,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
             }
         }
         catch(Exception e) {
-            boolean actualError = true;
-            String errorString = e.getMessage();
-
-            // If the errorString only contains numbers, it's an actual error
-            if (errorString != null && errorString.length() != 0) {
-                for (int i = 0; i < errorString.length(); i++) {
-                    if (!Character.isDigit(errorString.charAt(i))) {
-                        actualError = false;
-                        break;
-                    }
-                }
-            }
-
-            if (!actualError) {
-                event.getPlayer().sendMessage(errorString);
-            }
-            else{
-                plugin.log("An error has occured. Player:" + event.getPlayer().getName() + " Command:" + event.getMessage());
-                plugin.log(e.toString());
-                e.printStackTrace();
-                if (plugin.inDebugMode()){
-                    Writer result = new StringWriter();
-                    PrintWriter printWriter = new PrintWriter(result);
-                    e.printStackTrace(printWriter);
-                    String[] stackTrace = result.toString().split(System.getProperty("line.separator"));
-                    for (int i = 0; i<stackTrace.length && i<4;i++){
-                        plugin.getServer().broadcastMessage(stackTrace[i]);
-                    }
-                }
-            }
+            plugin.handleException(e, event.getPlayer().getName());
         }
     }
 
@@ -425,6 +395,21 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     player.sendMessage("Remove failed.");
                 }
                 playerStates.remove(playerName);
+                break;
+            // Modify
+            case 6:
+                String commandString = playerStatesData.get(playerName);
+                playerStatesData.remove(playerName);
+                playerStates.remove(playerName);
+                try {
+                    ServiceContractsCommand command = new ServiceContractsCommand(plugin, commandString);
+                    String modifyId = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
+                    ServiceContractsContract modifyContract = plugin.getContracts().getContract(modifyId);
+                    modifyContract.modify((Integer)command.getOpenings(), (Integer)command.getPayment());
+                }
+                catch(Exception e){
+                    plugin.handleException(e, playerName);
+                }
                 break;
             // No state (applying)
             default:

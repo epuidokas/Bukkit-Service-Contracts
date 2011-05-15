@@ -197,4 +197,35 @@ public class ServiceContractsPlugin extends JavaPlugin {
             player.sendMessage(message);
     }
 
+    public void handleException (Exception e, String playerName) {
+        boolean actualError = true;
+        String errorString = e.getMessage();
+
+        // If the errorString only contains numbers, it's an actual error
+        if (errorString != null && errorString.length() != 0) {
+            for (int i = 0; i < errorString.length(); i++) {
+                if (!Character.isDigit(errorString.charAt(i))) {
+                    actualError = false;
+                    break;
+                }
+            }
+        }
+
+        if (!actualError) {
+            sendPlayerMessage(playerName, errorString);
+        }
+        else{
+            log(e.toString());
+            e.printStackTrace();
+            if (inDebugMode()){
+                Writer result = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(result);
+                e.printStackTrace(printWriter);
+                String[] stackTrace = result.toString().split(System.getProperty("line.separator"));
+                for (int i = 0; i<stackTrace.length && i<4;i++){
+                    getServer().broadcastMessage(stackTrace[i]);
+                }
+            }
+        }
+    }
 }

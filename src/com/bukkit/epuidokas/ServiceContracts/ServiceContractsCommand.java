@@ -11,11 +11,11 @@ public class ServiceContractsCommand {
     private ServiceContractsPlugin plugin;
     private int action = 0;
     private int type = 0;
-    private int openings = 0;
-    private int length = 0;
-    private int payment = 0;
-    private int x = 0;
-    private int z = 0;
+    private Integer openings = null;
+    private Integer length = null;
+    private Integer payment = null;
+    private Integer x = null;
+    private Integer z = null;
     private String landmark = "";
     private String message = "";
     private String player = "";
@@ -134,6 +134,12 @@ public class ServiceContractsCommand {
         // Modify contract
         else if(action_str.contentEquals("-" + plugin.getString("COMMAND_MODIFY_SHORT")) || action_str.contentEquals(plugin.getString("COMMAND_MODIFY"))) {
             action = 11;
+            if (command_parts.length < 3)
+                throw new Exception(String.format(plugin.getString("INVALID_MODIFY_ARGS"), getCommandFormat(11)));
+            if (!parseOpenings(command_parts[2]))
+                throw new Exception(String.format(plugin.getString("INVALID_NUM_OPENINGS"), command_parts[2], getCommandFormat(11)));
+            if (command_parts.length > 3 && !parsePayment(command_parts[3]))
+                throw new Exception(String.format(plugin.getString("INVALID_PAYMENT"), command_parts[3], getCommandFormat(11)));
         }
 
         // Get info on contract
@@ -156,23 +162,23 @@ public class ServiceContractsCommand {
         return type;
     }
 
-    public int getOpenings() {
+    public Integer getOpenings() {
         return openings;
     }
 
-    public int getLength() {
+    public Integer getLength() {
         return length;
     }
 
-    public int getPayment() {
+    public Integer getPayment() {
         return payment;
     }
 
-    public int getX() {
+    public Integer getX() {
         return x;
     }
 
-    public int getZ() {
+    public Integer getZ() {
         return z;
     }
 
@@ -473,17 +479,17 @@ public class ServiceContractsCommand {
             // MODIFY
             case 11:
                 if (!full) {
-                    return String.format("/%s -%s",
+                    return String.format("/%s -%s <%s>",
                                          plugin.getString("COMMAND"),
-                                         plugin.getString("COMMAND_MODIFY_SHORT"));
+                                         plugin.getString("COMMAND_MODIFY_SHORT"),
+                                         plugin.getString("MODIFY_COMMAND_NUM_OPENINGS"));
                 }
                 else {
-                    return String.format("/%s -%s|%s <%s> <%s> <%s>",
+                    return String.format("/%s -%s|%s <%s> [<%s>]",
                                          plugin.getString("COMMAND"),
                                          plugin.getString("COMMAND_MODIFY_SHORT"),
                                          plugin.getString("COMMAND_MODIFY"),
                                          plugin.getString("MODIFY_COMMAND_NUM_OPENINGS"),
-                                         plugin.getString("MODIFY_COMMAND_LENGTH"),
                                          plugin.getString("MODIFY_COMMAND_PAYMENT"));
                 }
             // INFO

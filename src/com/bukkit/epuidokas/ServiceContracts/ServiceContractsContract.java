@@ -40,27 +40,13 @@ public class ServiceContractsContract {
     public ServiceContractsContract(ServiceContractsPlugin instance, Player player, ServiceContractsCommand command) throws Exception{
         plugin = instance;
         type = command.getType();
-        openings = command.getOpenings();
-        payPeriods = (int)command.getLength()/PAY_INTERVAL;
+        payPeriods = (int)(command.getLength()/PAY_INTERVAL);
         length = payPeriods*PAY_INTERVAL;
-        payPerPeriod = (int)command.getPayment()/payPeriods;
-        payment = payPerPeriod*payPeriods;
+        setPayment(command.getPayment());
         x = command.getX();
         z = command.getZ();
         employer = player.getName();
-        
-        Account account = plugin.getIConomy().getBank().getAccount(employer);
-
-        if(!account.hasEnough(money)) {
-            openings = (int)account.getBalance()/payment;
-            if (openings > 0) {
-                player.sendMessage(String.format(plugin.getString("MONEY_WARNING"), openings));
-            }
-            else {
-                throw new Exception(plugin.getString("MONEY_ERROR"));
-            }
-        }
-
+        setOpenings(command.getOpenings());
     }
 
     public boolean setId(Sign sign) {
@@ -152,7 +138,7 @@ public class ServiceContractsContract {
         return type;
     }
 
-    public boolean addContractor(String contractorName){
+    public boolean addContractor(String contractorName) throws Exception{
         if (getOpenings() < 1) {
             plugin.getServer().getPlayer(employer).sendMessage(plugin.getString("NOT_ENOUGH_OPENINGS"));
             return false;
@@ -173,6 +159,7 @@ public class ServiceContractsContract {
         plugin.setContractByContractor(contractorName, id);
         removeApplicant(contractorName);
         setOpenings(getOpenings()-1);
+        drawSign();
         return true;
     }
 
@@ -222,9 +209,28 @@ public class ServiceContractsContract {
         return true;
     }
 
-    public boolean setOpenings(int num) {
+    public boolean setPayment(Integer amount) {
+        if (amount == null)
+            return false;
+        payPerPeriod = (int)(amount/payPeriods);
+        payment = payPerPeriod*payPeriods;
+        return true;
+    }
+
+    public boolean setOpenings(int num) throws Exception {
+        Account account = plugin.getIConomy().getBank().getAccount(employer);
+
+        if(!account.hasEnough(money)) {
+            openings = (int)account.getBalance()/payment;
+            if (openings > 0) {
+                plugin.sendPlayerMessage(employer, String.format(plugin.getString("MONEY_WARNING"), openings));
+            }
+            else {
+                throw new Exception(plugin.getString("MONEY_ERROR"));
+            }
+        }
         openings = num;
-        return drawSign();
+        return true;
     }
 
     public int getOpenings() {
@@ -236,9 +242,9 @@ public class ServiceContractsContract {
 
     public boolean sendInfoMessage(Player player){
         // @todo l10n
-        player.sendMessage(type + " contract offerd by " + employer);
+        player.sendMessage(plugin.getString("TYPE_" + type + "_READABLE") + " contract offerd by " + employer);
         player.sendMessage( payment + "c for " + length + "min of work");
-        player.sendMessage("Contract is located at " + x + "," + z);
+        player.sendMessage("Contract is located at " + x + ", " + z);
         player.sendMessage(getOpenings() + " opening(s) left");
         return true;
     }
@@ -267,5 +273,13 @@ public class ServiceContractsContract {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean modify(Integer o, Integer p) throws Exception {
+        if (p != null && p < payment)
+            throw new Exception(plugin.getString("MODIFY_BAD_PAYMENT"));
+        setOpenings(o);
+        setPayment(p);
+        return drawSign();
     }
 }
