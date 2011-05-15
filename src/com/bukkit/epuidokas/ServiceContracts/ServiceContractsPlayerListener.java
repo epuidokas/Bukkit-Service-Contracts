@@ -86,12 +86,10 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     break;
                 // Close
                 case 2:
-                    player.sendMessage("CLOSE!!!");
                     if (!plugin.getPermissions().has(player, PERMISSIONS_CLOSE) && !plugin.getPermissions().has(player, PERMISSIONS_CLOSE_ANY)) {
                         player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_CLOSE));
                         break;
                     }
-                    player.sendMessage("CLOSE!!!");
                     player.sendMessage(plugin.getString("SELECT_SIGN"));
                     playerStates.put(player.getName(),3);
                     break;
@@ -113,24 +111,6 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     player.sendMessage(plugin.getString("SELECT_SIGN"));
                     playerStates.put(player.getName(),5);
                     break;
-                    /*
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_REMOVE)) {
-                        player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_REMOVE));
-                        break;
-                    }
-                    ServiceContractsContract removeContract = plugin.getContracts().getContract(command.getContract());
-                    if (removeContract == null) {
-                        player.sendMessage(plugin.getString("INVALID_CONTRACT"));
-                        break;
-                    }
-                    if (!removeContract.getEmployer().contentEquals(player.getName()) && !plugin.getPermissions().has(player, PERMISSIONS_REMOVE_ANY)) {
-                        player.sendMessage(String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_REMOVE_ANY));
-                        break;
-                    }
-                    plugin.getContracts().removeContract(removeContract.getId());
-                    player.sendMessage(String.format(plugin.getString("REMOVE_CONTRACT"), command.getContract()));
-                    break;
-                     */
                 // Apply
                 case 5:
                     if (!plugin.getPermissions().has(player, PERMISSIONS_APPLY)) {
@@ -303,7 +283,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     String quitContractId = plugin.getContractByContractor(quitContractorId);
                     ServiceContractsContract quitContract = plugin.getContracts().getContract(quitContractId);
                     if (quitContract == null || !quitContract.removeContractor(quitContractorId)){
-                        player.sendMessage(plugin.getString("INVALID_CONTRACT"));
+                        player.sendMessage(plugin.getString("QUIT_FAILED"));
                         break;
                     }
                     player.sendMessage(plugin.getString("CONTRACTOR_QUIT"));
@@ -378,7 +358,14 @@ public class ServiceContractsPlayerListener extends PlayerListener {
         switch(playerState) {
             // New
             case 1:
-                // @todo verify this clicked block is a valid place to add the contract
+                // @todo check if they have permissions for the block
+                String newId = ServiceContractsContract.createId(sign.getX(),sign.getY(),sign.getZ());
+                if (plugin.getContracts().contains(newId)) {
+                    newContracts.remove(playerName);
+                    playerStates.remove(playerName);
+                    player.sendMessage(plugin.getString("CONTRACT_ALREADY_THERE"));
+                    break;
+                }
                 ServiceContractsContract newContract = newContracts.get(playerName);
                 newContract.setId(sign);
                 newContract.drawSign();

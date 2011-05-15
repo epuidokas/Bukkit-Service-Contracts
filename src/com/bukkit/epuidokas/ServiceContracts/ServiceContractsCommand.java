@@ -44,11 +44,13 @@ public class ServiceContractsCommand {
                 if (!parsePayment(command_parts[5]))
                     throw new Exception(String.format(plugin.getString("INVALID_PAYMENT"), command_parts[5], getCommandFormat(1)));
                 if (!parseX(command_parts[6]))
-                    throw new Exception(String.format(plugin.getString("INVALID_X"), command_parts[6], getCommandFormat(1)));
+                    throw new Exception(String.format(plugin.getString("INVALID_COORD"), command_parts[6], getCommandFormat(1)));
                 if (!parseZ(command_parts[7]))
-                    throw new Exception(String.format(plugin.getString("INVALID_Z"), command_parts[7], getCommandFormat(1)));
-                if (command_parts.length == 9 && !parseLandmark(command_parts[8]))
+                    throw new Exception(String.format(plugin.getString("INVALID_COORD"), command_parts[7], getCommandFormat(1)));
+                if (command_parts.length == 9){
+                    if (!parseLandmark(command_parts[8]))
                     throw new Exception(String.format(plugin.getString("INVALID_LANDMARK"), command_parts[8], getCommandFormat(1)));
+                }
             }
             else {
                 throw new Exception(String.format(plugin.getString("INVALID_NEW_ARGS"), getCommandFormat(1)));

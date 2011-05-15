@@ -39,6 +39,9 @@ public class ServiceContractsPlugin extends JavaPlugin {
         getDataFolder().setWritable(true);
         getDataFolder().setExecutable(true);
 
+        // Extract software license
+        extractFile("/README");
+
         // Load string translations
         // @TODO make en-US configurable and support other languages
         extractFile("/strings_en-US.properties");
@@ -91,7 +94,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
                         output.write(buf, 0, length);
                     }
 
-                    log("Extracted file: " + name);
+                    log("Extracted file: " + actual.getAbsolutePath());
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -181,6 +184,17 @@ public class ServiceContractsPlugin extends JavaPlugin {
     public boolean removeApplicant(String contractor) {
         applicants.remove(contractor);
         return true;
+    }
+
+    public void sendPlayerMessage(String playerId, String message) {
+        Player player = getServer().getPlayer(playerId);
+        if (player instanceof Player)
+            player.sendMessage(message);
+    }
+
+    public void sendPlayerMessage(Player player, String message) {
+        if (player instanceof Player)
+            player.sendMessage(message);
     }
 
 }

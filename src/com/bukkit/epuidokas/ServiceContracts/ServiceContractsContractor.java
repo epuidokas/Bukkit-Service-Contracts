@@ -40,13 +40,11 @@ public class ServiceContractsContractor {
 
     public boolean logWork (){
         Player player = plugin.getServer().getPlayer(playerName);
-        if (!(player instanceof Player)) {
-            plugin.log("Couldn't find player '" +playerName+ "' for contract '" +contractId+ "'; logWork failed");
-            return false;
-        }
-        if (!player.isOnline()){
+        if (!(player instanceof Player) || !player.isOnline()) {
             pause();
-            plugin.getServer().getPlayer(plugin.getContracts().getContract(contractId).getEmployer()).sendMessage(String.format(plugin.getString("CONTRACTOR_OFFLINE"), playerName));
+            Player employer = plugin.getServer().getPlayer(plugin.getContracts().getContract(contractId).getEmployer());
+            if (employer instanceof Player)
+                employer.sendMessage(String.format(plugin.getString("CONTRACTOR_OFFLINE"), playerName));
             return false;
         }
         time++;

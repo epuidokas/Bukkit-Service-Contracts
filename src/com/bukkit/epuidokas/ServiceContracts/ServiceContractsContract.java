@@ -108,14 +108,13 @@ public class ServiceContractsContract {
     public boolean drawSign() {
         final Block block = plugin.getServer().getWorld("world").getBlockAt(signX, signY, signZ);
         final Sign sign = (Sign)block.getState();
-        // @todo l10n
-        sign.setLine(0, plugin.getString("TYPE_" + type));
-        sign.setLine(1, (landmark.isEmpty()) ? x + "," + z : "-near " + landmark + "-");
-        sign.setLine(2, payment + "c/" + length + "min");
+        sign.setLine(0, String.format(plugin.getString("SIGN_LINE1"), plugin.getString("TYPE_" + type + "_READABLE")));
+        sign.setLine(1, (landmark.isEmpty()) ? String.format(plugin.getString("SIGN_LINE2"), x, z) : String.format(plugin.getString("SIGN_LINE2_LANDMARK"), landmark));
+        sign.setLine(2, String.format(plugin.getString("SIGN_LINE3"), payment, length));
         if (enabled)
-            sign.setLine(3, "\u00A76" + getOpenings() + " opening(s)");
+            sign.setLine(3, String.format(plugin.getString("SIGN_LINE4"), getOpenings()));
         else
-            sign.setLine(3, "<Closed>");
+            sign.setLine(3, plugin.getString("SIGN_LINE4_CLOSED"));
 
         updateSign();
 
@@ -178,6 +177,11 @@ public class ServiceContractsContract {
     }
 
     public boolean submitTimecard(String contractorName, Integer time){
+        if (time >= length) {
+            plugin.sendPlayerMessage(contractorName, "Your contract is complete!");
+            plugin.getContracts().removeContract(id);
+            return pay(contractorName);
+        }
         if (time % PAY_INTERVAL == 0)
             return pay(contractorName);
         return true;

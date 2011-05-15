@@ -34,4 +34,8 @@ public class ServiceContractsContracts {
     public ServiceContractsContract getContract(String id) {
         return contracts.get(id);
     }
+
+    public boolean contains(String id) {
+        return contracts.containsKey(id);
+    }
 }
