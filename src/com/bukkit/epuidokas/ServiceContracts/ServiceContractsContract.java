@@ -30,7 +30,6 @@ public class ServiceContractsContract {
     private int signX = 0;
     private int signY = 0;
     private int signZ = 0;
-    private int money = 0;
     private int potentialCost = 0;
     private String employer = "";
     private HashMap<String,ServiceContractsContractor> contractors = new HashMap();
@@ -220,8 +219,8 @@ public class ServiceContractsContract {
     public boolean setOpenings(int num) throws Exception {
         Account account = plugin.getIConomy().getBank().getAccount(employer);
 
-        if(!account.hasEnough(money)) {
-            openings = (int)account.getBalance()/payment;
+        if(!account.hasEnough(payment*num)) {
+            openings = (int)(account.getBalance()/payment);
             if (openings > 0) {
                 plugin.sendPlayerMessage(employer, String.format(plugin.getString("MONEY_WARNING"), openings));
             }
