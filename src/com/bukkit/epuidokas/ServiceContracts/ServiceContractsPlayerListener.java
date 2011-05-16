@@ -317,11 +317,11 @@ public class ServiceContractsPlayerListener extends PlayerListener {
 
     public void onPlayerInteract(PlayerInteractEvent event) {
         Block block = event.getClickedBlock();
-        if (block.getTypeId() != 68 || event.isCancelled())
+        Sign sign = (Sign)block.getState();
+        if (!(sign instanceof Sign) || event.isCancelled())
             return;
         Player player = event.getPlayer();
         String playerName = player.getName();
-        Sign sign = (Sign)block.getState();
         int playerState = 0;
         if (playerStates.containsKey(playerName))
             playerState = playerStates.get(playerName);
