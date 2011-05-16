@@ -218,11 +218,10 @@ public class ServiceContractsContract {
 
     public boolean setOpenings(int num) throws Exception {
         Account account = plugin.getIConomy().getBank().getAccount(employer);
-
         if(!account.hasEnough(payment*num)) {
-            openings = (int)(account.getBalance()/payment);
-            if (openings > 0) {
-                plugin.sendPlayerMessage(employer, String.format(plugin.getString("MONEY_WARNING"), openings));
+            num = (int)(account.getBalance()/payment);
+            if (num > 0) {
+                plugin.sendPlayerMessage(employer, String.format(plugin.getString("MONEY_WARNING"), num));
             }
             else {
                 throw new Exception(plugin.getString("MONEY_ERROR"));
