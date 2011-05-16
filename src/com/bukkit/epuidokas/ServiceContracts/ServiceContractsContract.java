@@ -79,7 +79,7 @@ public class ServiceContractsContract {
 
         Account contractorAccount = plugin.getIConomy().getBank().getAccount(contractorName);
         contractorAccount.add(payPerPeriod);
-        contractor.sendMessage(String.format(plugin.getString("PAID"), payPerPeriod));
+        plugin.sendPlayerMessage(contractor, String.format(plugin.getString("PAID"), payPerPeriod));
         return true;
     }
 
@@ -140,18 +140,18 @@ public class ServiceContractsContract {
 
     public boolean addContractor(String contractorName) throws Exception{
         if (getOpenings() < 1) {
-            plugin.getServer().getPlayer(employer).sendMessage(plugin.getString("NOT_ENOUGH_OPENINGS"));
+            plugin.sendPlayerMessage(employer, plugin.getString("NOT_ENOUGH_OPENINGS"));
             return false;
         }
 
         if (!applicants.contains(contractorName)) {
-            plugin.getServer().getPlayer(employer).sendMessage(String.format(plugin.getString("NOT_AN_APPLICANT"), contractorName));
+            plugin.sendPlayerMessage(employer, String.format(plugin.getString("NOT_AN_APPLICANT"), contractorName));
             return false;
         }
         
         Account account = plugin.getIConomy().getBank().getAccount(employer);
         if (!account.hasEnough(payment)){
-            plugin.getServer().getPlayer(employer).sendMessage(plugin.getString("INSUFFICIENT_FUNDS"));
+            plugin.sendPlayerMessage(employer, plugin.getString("INSUFFICIENT_FUNDS"));
             setOpenings(0);
             return false;
         }
@@ -189,7 +189,7 @@ public class ServiceContractsContract {
             contractor = contractors.remove(contractorId);
             contractor.pause();
             plugin.removeContractByContractor(contractorId);
-            plugin.getServer().getPlayer(contractorId).sendMessage(String.format(plugin.getString("REMOVE_CONTRACT"), id));
+            plugin.sendPlayerMessage(contractorId, String.format(plugin.getString("REMOVE_CONTRACT"), id));
         }
 
         return true;
@@ -242,10 +242,10 @@ public class ServiceContractsContract {
 
     public boolean sendInfoMessage(Player player){
         // @todo l10n
-        player.sendMessage(plugin.getString("TYPE_" + type + "_READABLE") + " contract offerd by " + employer);
-        player.sendMessage( payment + "c for " + length + "min of work");
-        player.sendMessage("Contract is located at " + x + ", " + z);
-        player.sendMessage(getOpenings() + " opening(s) left");
+        plugin.sendPlayerMessage(player, plugin.getString("TYPE_" + type + "_READABLE") + " contract offerd by " + employer);
+        plugin.sendPlayerMessage(player,  payment + "c for " + length + "min of work");
+        plugin.sendPlayerMessage(player, "Contract is located at " + x + ", " + z);
+        plugin.sendPlayerMessage(player, getOpenings() + " opening(s) left");
         return true;
     }
 

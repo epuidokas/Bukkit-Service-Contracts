@@ -44,7 +44,7 @@ public class ServiceContractsContractor {
             pause();
             Player employer = plugin.getServer().getPlayer(plugin.getContracts().getContract(contractId).getEmployer());
             if (employer instanceof Player)
-                employer.sendMessage(String.format(plugin.getString("CONTRACTOR_OFFLINE"), playerName));
+                plugin.sendPlayerMessage(employer, String.format(plugin.getString("CONTRACTOR_OFFLINE"), playerName));
             return false;
         }
         time++;
@@ -56,8 +56,8 @@ public class ServiceContractsContractor {
         boolean log = plugin.getContracts().getContract(contractId).submitTimecard(playerName, time);
 
         if(!log) {
-            player.sendMessage(plugin.getString("CONTRACTOR_PAY_FAILED"));
-            plugin.getServer().getPlayer(plugin.getContracts().getContract(contractId).getEmployer()).sendMessage(String.format(plugin.getString("EMPLOYER_PAY_FAILED"), playerName));
+            plugin.sendPlayerMessage(player, plugin.getString("CONTRACTOR_PAY_FAILED"));
+            plugin.sendPlayerMessage(plugin.getContracts().getContract(contractId).getEmployer(), String.format(plugin.getString("EMPLOYER_PAY_FAILED"), playerName));
             return false;
         }
 
