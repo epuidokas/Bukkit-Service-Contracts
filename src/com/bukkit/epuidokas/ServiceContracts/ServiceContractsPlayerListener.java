@@ -317,12 +317,9 @@ public class ServiceContractsPlayerListener extends PlayerListener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.isCancelled())
             return;
-        Block block = event.getClickedBlock();
-        if (!(block instanceof Block))
+        if (!(event.getClickedBlock().getState() instanceof Sign))
             return;
-        Sign sign = (Sign)block.getState();
-        if (!(sign instanceof Sign))
-            return;
+        Sign sign = (Sign)event.getClickedBlock().getState();
         Player player = event.getPlayer();
         String playerName = player.getName();
         int playerState = 0;
