@@ -1,5 +1,8 @@
 package com.bukkit.epuidokas.ServiceContracts;
 
+import com.iConomy.system.Account;
+import com.iConomy.system.BankAccount;
+import com.iConomy.system.Holdings;
 import org.bukkit.entity.Player;
 import org.bukkit.Server;
 import org.bukkit.event.Event.Priority;
@@ -21,8 +24,8 @@ import java.util.*;
  */
 public class ServiceContractsPlugin extends JavaPlugin {
 
-    private iConomy iConomy = null;
-    private PermissionHandler permissions = null;
+    private static iConomy iConomy = null;
+    private static PermissionHandler permissions = null;
     private final ServiceContractsContracts contracts = new ServiceContractsContracts(this);
     private final HashMap<String,String> contractors = new HashMap();
     private final HashMap<String,ArrayList<String>> applicants = new HashMap();
@@ -120,7 +123,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
         System.out.println("["+pdfFile.getName()+"]["+pdfFile.getVersion()+"] " + message);
     }
 
-    public iConomy getIConomy() {
+    public static iConomy getIConomy() {
         return iConomy;
     }
 
@@ -135,7 +138,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
         }
     }
 
-    public PermissionHandler getPermissions() {
+    public static PermissionHandler getPermissions() {
         return permissions;
     }
 
@@ -239,5 +242,13 @@ public class ServiceContractsPlugin extends JavaPlugin {
         lastContractId++;
         contractIdMapping.put(lastContractId, contractId);
         return lastContractId;
+    }
+
+    public static Holdings getPlayerHoldings (String playerId) {
+        Account account = getIConomy().getAccount(playerId);
+        if(account.getMainBankAccount() != null) {
+            return account.getMainBankAccount().getHoldings();
+        }
+        return account.getHoldings();
     }
 }
