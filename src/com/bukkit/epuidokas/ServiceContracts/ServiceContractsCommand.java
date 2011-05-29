@@ -19,7 +19,7 @@ public class ServiceContractsCommand {
     private String landmark = "";
     private String message = "";
     private String player = "";
-    private String contract = "";
+    private Integer contract = null;
 
     public ServiceContractsCommand(ServiceContractsPlugin instance, String command) throws Exception{
 
@@ -194,7 +194,7 @@ public class ServiceContractsCommand {
         return player;
     }
 
-    public String getContract() {
+    public Integer getContract() {
         return contract;
     }
 
@@ -292,7 +292,7 @@ public class ServiceContractsCommand {
     }
 
     private boolean parseContract(String str) {
-        contract = str;
+        contract = Integer.parseInt(str);
         return true;
     }
 

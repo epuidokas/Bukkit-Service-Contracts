@@ -35,6 +35,10 @@ public class ServiceContractsContracts {
         return contracts.get(id);
     }
 
+    public ServiceContractsContract getContract(Integer id) {
+        return getContract(plugin.contractIdIntToStr(id));
+    }
+
     public boolean contains(String id) {
         return contracts.containsKey(id);
     }

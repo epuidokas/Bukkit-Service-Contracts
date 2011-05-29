@@ -19,6 +19,7 @@ public class ServiceContractsContract {
 
     private final ServiceContractsPlugin plugin;
     private String id = null;
+    private Integer intId = null;
     private int action = 0;
     private int type = 0;
     private int openings = 0;
@@ -59,6 +60,7 @@ public class ServiceContractsContract {
         signY = y;
         signZ = z;
         id = createId(x,y,z);
+        intId = plugin.addContractId(id);
         return true;
     }
 
@@ -86,6 +88,10 @@ public class ServiceContractsContract {
 
     public String getId() {
         return id;
+    }
+
+    public Integer getIntId() {
+        return intId;
     }
 
     public static String createId(int x, int y, int z) {

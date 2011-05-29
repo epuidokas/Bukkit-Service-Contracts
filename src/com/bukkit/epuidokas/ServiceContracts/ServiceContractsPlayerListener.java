@@ -144,7 +144,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                             applyContract.addApplicant(player.getName());
                             plugin.sendPlayerMessage(player, "Application submitted!");
                             plugin.sendPlayerMessage(employer, player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
-                            plugin.sendPlayerMessage(employer, "To accept, type '/sc -e " + applyContract.getId() + " " + player.getName() + "'");
+                            plugin.sendPlayerMessage(employer, "To accept, type '/sc -e " + applyContract.getIntId().toString() + " " + player.getName() + "'");
                         }
                     }
                     else {
@@ -188,7 +188,7 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         }
                     }
                     // @todo l10n
-                    plugin.sendPlayerMessage(employEmployer, "Type `/sc -s " + employContract.getId() + " " + contractorName + "` to start paying them.");
+                    plugin.sendPlayerMessage(employEmployer, "Type `/sc -s " + employContract.getIntId().toString() + " " + contractorName + "` to start paying them.");
                     break;
                 // Fire
                 case 7:
