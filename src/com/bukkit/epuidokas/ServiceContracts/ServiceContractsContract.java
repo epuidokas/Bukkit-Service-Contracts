@@ -2,10 +2,12 @@ package com.bukkit.epuidokas.ServiceContracts;
 
 import java.util.*;
 import java.lang.*;
+
+import com.iConomy.system.Account;
 import org.bukkit.entity.Player;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Block;
-import com.nijiko.coelho.iConomy.system.Account;
+import com.iConomy.*;
 
 /**
  *
@@ -69,15 +71,15 @@ public class ServiceContractsContract {
         if (!contractors.containsKey(contractorName))
             return false;
 
-        Account employerAccount = plugin.getIConomy().getBank().getAccount(employer);
-        if(!employerAccount.hasEnough(payPerPeriod)) {
+        Account employerAccount = plugin.getIConomy().getAccount(employer);
+        if (!employerAccount.getMainBankAccount().getHoldings().hasEnough(payPerPeriod)){
             return false;
         }
 
-        employerAccount.subtract(payPerPeriod);
+        employerAccount.getMainBankAccount().getHoldings().subtract(payPerPeriod);
 
-        Account contractorAccount = plugin.getIConomy().getBank().getAccount(contractorName);
-        contractorAccount.add(payPerPeriod);
+        Account contractorAccount = plugin.getIConomy().getAccount(contractorName);
+        contractorAccount.getMainBankAccount().getHoldings().add(payPerPeriod);
         plugin.sendPlayerMessage(contractor, String.format(plugin.getString("PAID"), payPerPeriod));
         return true;
     }
@@ -147,9 +149,9 @@ public class ServiceContractsContract {
             plugin.sendPlayerMessage(employer, String.format(plugin.getString("NOT_AN_APPLICANT"), contractorName));
             return false;
         }
-        
-        Account account = plugin.getIConomy().getBank().getAccount(employer);
-        if (!account.hasEnough(payment)){
+
+        Account account = plugin.getIConomy().getAccount(employer);
+        if (!account.getMainBankAccount().getHoldings().hasEnough(payment)){
             plugin.sendPlayerMessage(employer, plugin.getString("INSUFFICIENT_FUNDS"));
             setOpenings(0);
             return false;
@@ -217,9 +219,9 @@ public class ServiceContractsContract {
     }
 
     public boolean setOpenings(int num) throws Exception {
-        Account account = plugin.getIConomy().getBank().getAccount(employer);
-        if(!account.hasEnough(payment*num)) {
-            num = (int)(account.getBalance()/payment);
+        Account account = plugin.getIConomy().getAccount(employer);
+        if(!account.getMainBankAccount().getHoldings().hasEnough(payment*num)) {
+            num = (int)(account.getMainBankAccount().getHoldings().balance()/payment);
             if (num > 0) {
                 plugin.sendPlayerMessage(employer, String.format(plugin.getString("MONEY_WARNING"), num));
             }

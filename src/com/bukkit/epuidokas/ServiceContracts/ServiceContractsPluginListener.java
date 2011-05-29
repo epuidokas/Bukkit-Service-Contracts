@@ -1,6 +1,6 @@
 package com.bukkit.epuidokas.ServiceContracts;
 import org.bukkit.event.server.ServerListener;
-import com.nijiko.coelho.iConomy.iConomy;
+import com.iConomy.*;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.plugin.Plugin;
@@ -24,7 +24,9 @@ public class ServiceContractsPluginListener extends ServerListener {
         if(plugin.getIConomy() == null) {
             Plugin iconomy = plugin.getServer().getPluginManager().getPlugin("iConomy");
             if (iconomy != null) {
-                plugin.setIConomy((iConomy)iconomy);
+                if (iconomy.isEnabled() && iconomy.getClass().getName().equals("com.iConomy.iConomy")) {
+                    plugin.setIConomy((iConomy)iconomy);
+                }
             }
         }
 

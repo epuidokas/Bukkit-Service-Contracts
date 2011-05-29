@@ -9,7 +9,7 @@ import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import com.nijiko.coelho.iConomy.iConomy;
+import com.iConomy.*;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import java.io.*;
@@ -29,6 +29,8 @@ public class ServiceContractsPlugin extends JavaPlugin {
     private final ServiceContractsPlayerListener playerListener = new ServiceContractsPlayerListener(this);
     private final ServiceContractsPluginListener pluginListener = new ServiceContractsPluginListener(this);
     private final ServiceContractsBlockListener blockListener = new ServiceContractsBlockListener(this);
+    private final HashMap<Integer,String> contractIdMapping = new HashMap();
+    private Integer lastContractId = 0;
     private final Properties strings = new Properties();
     private final boolean debugMode = true;
 
@@ -227,5 +229,15 @@ public class ServiceContractsPlugin extends JavaPlugin {
                 }
             }
         }
+    }
+
+    public String contractIdIntToStr (Integer contractId) {
+        return contractIdMapping.get(contractId);
+    }
+
+    public Integer addContractId (String contractId) {
+        lastContractId++;
+        contractIdMapping.put(lastContractId, contractId);
+        return lastContractId;
     }
 }

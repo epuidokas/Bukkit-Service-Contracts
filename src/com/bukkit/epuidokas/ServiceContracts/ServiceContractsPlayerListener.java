@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Block;
-import com.nijiko.coelho.iConomy.iConomy;
+import com.iConomy.*;
 
 /**
  *
