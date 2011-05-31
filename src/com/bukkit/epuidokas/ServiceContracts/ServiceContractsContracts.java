@@ -1,12 +1,13 @@
 package com.bukkit.epuidokas.ServiceContracts;
 
 import java.util.*;
+import java.io.*;
 
 /**
  *
  * @author ep
  */
-public class ServiceContractsContracts {
+public class ServiceContractsContracts implements Serializable {
 
     private final HashMap<String,ServiceContractsContract> contracts = new HashMap();           // contractId : contract
     private final HashMap<String,String> contractsByOwner = new HashMap();                      // ownerId : contactId

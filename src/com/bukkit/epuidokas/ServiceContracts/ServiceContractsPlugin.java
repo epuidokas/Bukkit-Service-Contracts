@@ -32,6 +32,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
     private final ServiceContractsPlayerListener playerListener = new ServiceContractsPlayerListener();
     private final ServiceContractsPluginListener pluginListener = new ServiceContractsPluginListener();
     private final ServiceContractsBlockListener blockListener = new ServiceContractsBlockListener();
+    private final ServiceContractsWorldListener worldListener = new ServiceContractsWorldListener();
     private final HashMap<Integer,String> contractIdMapping = new HashMap();
     private Integer lastContractId = 0;
     private final Properties strings = new Properties();
@@ -68,6 +69,10 @@ public class ServiceContractsPlugin extends JavaPlugin {
         pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Event.Priority.Low, this);
         pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Low, this);
         pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Event.Priority.Low, this);
+        pm.registerEvent(Event.Type.WORLD_SAVE, worldListener, Event.Priority.Highest, this);
+
+        restoreAllData();
+        log("LAST CONTRACT ID:" + lastContractId);
 
         // Load successful
         log("loaded");
@@ -257,5 +262,65 @@ public class ServiceContractsPlugin extends JavaPlugin {
 
     public static ServiceContractsPlugin getPlugin(){
         return plugin;
+    }
+
+    public boolean backupAllData() {
+        String filepath = this.getDataFolder() + File.separator;
+        backupData(filepath +"contracts.bak", contracts);
+        backupData(filepath +"contractors.bak", contractors);
+        backupData(filepath +"applicants.bak", applicants);
+        backupData(filepath +"contractIdMapping.bak", contractIdMapping);
+        backupData(filepath +"lastContractId.bak", lastContractId);
+        log("Back-up saved!");
+        return true;
+    }
+
+    private boolean backupData(String filename, Object data){
+        FileOutputStream fos = null;
+        ObjectOutputStream out = null;
+        try
+        {
+            fos = new FileOutputStream(filename);
+            out = new ObjectOutputStream(fos);
+            out.writeObject(data);
+            out.close();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public boolean restoreAllData() {
+        String filepath = this.getDataFolder() + File.separator;
+        backupData(filepath +"contracts.bak", contracts);
+        backupData(filepath +"contractors.bak", contractors);
+        backupData(filepath +"applicants.bak", applicants);
+        backupData(filepath +"contractIdMapping.bak", contractIdMapping);
+        backupData(filepath +"lastContractId.bak", lastContractId);
+        log("Back-up data restored!");
+        return true;
+    }
+
+    private boolean restoreData(String filename, Object data){
+        FileInputStream fis = null;
+        ObjectInputStream in = null;
+        try
+        {
+            fis = new FileInputStream(filename);
+            in = new ObjectInputStream(fis);
+            data = in.readObject();
+            in.close();
+        }
+        catch(IOException ex)
+        {
+            ex.printStackTrace();
+        }
+        catch(ClassNotFoundException ex)
+        {
+            ex.printStackTrace();
+        }
+        return true;
     }
 }

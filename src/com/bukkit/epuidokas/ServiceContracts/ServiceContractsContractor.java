@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
  *
  * @author ep
  */
-public class ServiceContractsContractor {
+public class ServiceContractsContractor implements Serializable {
 
     private final int NUM_OF_SEC_PER_MIN = 5;
 

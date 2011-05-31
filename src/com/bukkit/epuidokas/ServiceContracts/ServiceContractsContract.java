@@ -1,5 +1,6 @@
 package com.bukkit.epuidokas.ServiceContracts;
 
+import java.io.Serializable;
 import java.util.*;
 import java.lang.*;
 
@@ -13,7 +14,7 @@ import com.iConomy.*;
  *
  * @author ep
  */
-public class ServiceContractsContract {
+public class ServiceContractsContract implements Serializable {
 
     private final int PAY_INTERVAL = 5;
 
@@ -247,7 +248,7 @@ public class ServiceContractsContract {
     public boolean sendInfoMessage(Player player){
         // @todo l10n
         ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("TYPE_" + type + "_READABLE") + " contract offerd by " + employer);
-        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player,  payment + "c for " + length + "min of work");
+        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, payment + "c for " + length + "min of work");
         ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "Contract is located at " + x + ", " + z);
         ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, getOpenings() + " opening(s) left");
         return true;
