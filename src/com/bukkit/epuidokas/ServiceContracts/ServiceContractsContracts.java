@@ -8,14 +8,12 @@ import java.util.*;
  */
 public class ServiceContractsContracts {
 
-    private final ServiceContractsPlugin plugin;
     private final HashMap<String,ServiceContractsContract> contracts = new HashMap();           // contractId : contract
     private final HashMap<String,String> contractsByOwner = new HashMap();                      // ownerId : contactId
     private final HashMap<String,String> currentContract = new HashMap();                       // contractorId : contractId
     private final HashMap<String,ArrayList<String>> applicationsByContractor = new HashMap();   // contractorId : contactIds
     
-    public ServiceContractsContracts(ServiceContractsPlugin instance) {
-        plugin = instance;
+    public ServiceContractsContracts() {
     }
 
     public boolean addContract(ServiceContractsContract contract) {
@@ -36,7 +34,7 @@ public class ServiceContractsContracts {
     }
 
     public ServiceContractsContract getContract(Integer id) {
-        return getContract(plugin.contractIdIntToStr(id));
+        return getContract(ServiceContractsPlugin.getPlugin().contractIdIntToStr(id));
     }
 
     public boolean contains(String id) {

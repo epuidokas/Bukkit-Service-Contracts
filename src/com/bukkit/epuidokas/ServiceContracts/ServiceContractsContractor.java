@@ -13,18 +13,16 @@ public class ServiceContractsContractor {
 
     private final String playerName;
     private final String contractId;
-    private final ServiceContractsPlugin plugin;
     private Integer time = 0;
     private Integer taskId = null;
 
-    public ServiceContractsContractor(ServiceContractsPlugin instance, String player, String contract){
-        plugin = instance;
+    public ServiceContractsContractor(String player, String contract){
         playerName=player;
         contractId=contract;
     }
 
     public boolean start (){
-        taskId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+        taskId = ServiceContractsPlugin.getPlugin().getServer().getScheduler().scheduleSyncRepeatingTask(ServiceContractsPlugin.getPlugin(), new Runnable() {
             public void run() {
                 logWork();
             }
@@ -34,30 +32,30 @@ public class ServiceContractsContractor {
 
     public boolean pause (){
         if (taskId != null)
-            plugin.getServer().getScheduler().cancelTask(taskId);
+            ServiceContractsPlugin.getPlugin().getServer().getScheduler().cancelTask(taskId);
         return true;
     }
 
     public boolean logWork (){
-        Player player = plugin.getServer().getPlayer(playerName);
+        Player player = ServiceContractsPlugin.getPlugin().getServer().getPlayer(playerName);
         if (!(player instanceof Player) || !player.isOnline()) {
             pause();
-            Player employer = plugin.getServer().getPlayer(plugin.getContracts().getContract(contractId).getEmployer());
+            Player employer = ServiceContractsPlugin.getPlugin().getServer().getPlayer(ServiceContractsPlugin.getPlugin().getContracts().getContract(contractId).getEmployer());
             if (employer instanceof Player)
-                plugin.sendPlayerMessage(employer, String.format(plugin.getString("CONTRACTOR_OFFLINE"), playerName));
+                ServiceContractsPlugin.getPlugin().sendPlayerMessage(employer, String.format(ServiceContractsPlugin.getPlugin().getString("CONTRACTOR_OFFLINE"), playerName));
             return false;
         }
         time++;
-        ServiceContractsContract contract = plugin.getContracts().getContract(contractId);
+        ServiceContractsContract contract = ServiceContractsPlugin.getPlugin().getContracts().getContract(contractId);
         if (contract==null) {
-            plugin.log("Couldn't find contract '" +contractId+ "' for contractor '" +playerName+ "'");
+            ServiceContractsPlugin.getPlugin().log("Couldn't find contract '" +contractId+ "' for contractor '" +playerName+ "'");
             return false;
         }
-        boolean log = plugin.getContracts().getContract(contractId).submitTimecard(playerName, time);
+        boolean log = ServiceContractsPlugin.getPlugin().getContracts().getContract(contractId).submitTimecard(playerName, time);
 
         if(!log) {
-            plugin.sendPlayerMessage(player, plugin.getString("CONTRACTOR_PAY_FAILED"));
-            plugin.sendPlayerMessage(plugin.getContracts().getContract(contractId).getEmployer(), String.format(plugin.getString("EMPLOYER_PAY_FAILED"), playerName));
+            ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("CONTRACTOR_PAY_FAILED"));
+            ServiceContractsPlugin.getPlugin().sendPlayerMessage(ServiceContractsPlugin.getPlugin().getContracts().getContract(contractId).getEmployer(), String.format(ServiceContractsPlugin.getPlugin().getString("EMPLOYER_PAY_FAILED"), playerName));
             return false;
         }
 

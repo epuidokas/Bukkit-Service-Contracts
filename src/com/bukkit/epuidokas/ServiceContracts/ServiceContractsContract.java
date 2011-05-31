@@ -17,7 +17,6 @@ public class ServiceContractsContract {
 
     private final int PAY_INTERVAL = 5;
 
-    private final ServiceContractsPlugin plugin;
     private String id = null;
     private Integer intId = null;
     private int action = 0;
@@ -39,8 +38,7 @@ public class ServiceContractsContract {
     private ArrayList<String> applicants = new ArrayList();
     private boolean enabled = true;
 
-    public ServiceContractsContract(ServiceContractsPlugin instance, Player player, ServiceContractsCommand command) throws Exception{
-        plugin = instance;
+    public ServiceContractsContract(Player player, ServiceContractsCommand command) throws Exception{
         type = command.getType();
         payPeriods = (int)(command.getLength()/PAY_INTERVAL);
         length = payPeriods*PAY_INTERVAL;
@@ -60,12 +58,12 @@ public class ServiceContractsContract {
         signY = y;
         signZ = z;
         id = createId(x,y,z);
-        intId = plugin.addContractId(id);
+        intId = ServiceContractsPlugin.getPlugin().addContractId(id);
         return true;
     }
 
     private boolean pay(String contractorName) {
-        return pay(plugin.getServer().getPlayer(contractorName));
+        return pay(ServiceContractsPlugin.getPlugin().getServer().getPlayer(contractorName));
     }
 
     private boolean pay(Player contractor) {
@@ -82,7 +80,7 @@ public class ServiceContractsContract {
 
         Holdings contractorHoldings = ServiceContractsPlugin.getPlayerHoldings(contractorName);
         contractorHoldings.add(payPerPeriod);
-        plugin.sendPlayerMessage(contractor, String.format(plugin.getString("PAID"), payPerPeriod));
+        ServiceContractsPlugin.getPlugin().sendPlayerMessage(contractor, String.format(ServiceContractsPlugin.getPlugin().getString("PAID"), payPerPeriod));
         return true;
     }
 
@@ -99,15 +97,15 @@ public class ServiceContractsContract {
     }
 
     public boolean drawSign() {
-        final Block block = plugin.getServer().getWorld("world").getBlockAt(signX, signY, signZ);
+        final Block block = ServiceContractsPlugin.getPlugin().getServer().getWorld("world").getBlockAt(signX, signY, signZ);
         final Sign sign = (Sign)block.getState();
-        sign.setLine(0, String.format(plugin.getString("SIGN_LINE1"), plugin.getString("TYPE_" + type + "_READABLE")));
-        sign.setLine(1, (landmark.isEmpty()) ? String.format(plugin.getString("SIGN_LINE2"), x, z) : String.format(plugin.getString("SIGN_LINE2_LANDMARK"), landmark));
-        sign.setLine(2, String.format(plugin.getString("SIGN_LINE3"), payment, length));
+        sign.setLine(0, String.format(ServiceContractsPlugin.getPlugin().getString("SIGN_LINE1"), ServiceContractsPlugin.getPlugin().getString("TYPE_" + type + "_READABLE")));
+        sign.setLine(1, (landmark.isEmpty()) ? String.format(ServiceContractsPlugin.getPlugin().getString("SIGN_LINE2"), x, z) : String.format(ServiceContractsPlugin.getPlugin().getString("SIGN_LINE2_LANDMARK"), landmark));
+        sign.setLine(2, String.format(ServiceContractsPlugin.getPlugin().getString("SIGN_LINE3"), payment, length));
         if (enabled)
-            sign.setLine(3, String.format(plugin.getString("SIGN_LINE4"), getOpenings()));
+            sign.setLine(3, String.format(ServiceContractsPlugin.getPlugin().getString("SIGN_LINE4"), getOpenings()));
         else
-            sign.setLine(3, plugin.getString("SIGN_LINE4_CLOSED"));
+            sign.setLine(3, ServiceContractsPlugin.getPlugin().getString("SIGN_LINE4_CLOSED"));
 
         updateSign();
 
@@ -115,7 +113,7 @@ public class ServiceContractsContract {
     }
 
     public boolean removeSign() {
-        final Block block = plugin.getServer().getWorld("world").getBlockAt(signX, signY, signZ);
+        final Block block = ServiceContractsPlugin.getPlugin().getServer().getWorld("world").getBlockAt(signX, signY, signZ);
         final Sign sign = (Sign)block.getState();
         sign.setLine(0, "");
         sign.setLine(1, "");
@@ -127,9 +125,9 @@ public class ServiceContractsContract {
 
     private boolean updateSign(){
         // @todo support multiple worlds
-        final Block block = plugin.getServer().getWorld("world").getBlockAt(signX, signY, signZ);
+        final Block block = ServiceContractsPlugin.getPlugin().getServer().getWorld("world").getBlockAt(signX, signY, signZ);
         final Sign sign = (Sign)block.getState();
-        this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+        ServiceContractsPlugin.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(ServiceContractsPlugin.getPlugin(), new Runnable() {
             public void run() {
                 sign.update();
             }
@@ -147,23 +145,23 @@ public class ServiceContractsContract {
 
     public boolean addContractor(String contractorName) throws Exception{
         if (getOpenings() < 1) {
-            plugin.sendPlayerMessage(employer, plugin.getString("NOT_ENOUGH_OPENINGS"));
+            ServiceContractsPlugin.getPlugin().sendPlayerMessage(employer, ServiceContractsPlugin.getPlugin().getString("NOT_ENOUGH_OPENINGS"));
             return false;
         }
 
         if (!applicants.contains(contractorName)) {
-            plugin.sendPlayerMessage(employer, String.format(plugin.getString("NOT_AN_APPLICANT"), contractorName));
+            ServiceContractsPlugin.getPlugin().sendPlayerMessage(employer, String.format(ServiceContractsPlugin.getPlugin().getString("NOT_AN_APPLICANT"), contractorName));
             return false;
         }
 
         Holdings holdings = ServiceContractsPlugin.getPlayerHoldings(employer);
         if (!holdings.hasEnough(payment)){
-            plugin.sendPlayerMessage(employer, plugin.getString("INSUFFICIENT_FUNDS"));
+            ServiceContractsPlugin.getPlugin().sendPlayerMessage(employer, ServiceContractsPlugin.getPlugin().getString("INSUFFICIENT_FUNDS"));
             setOpenings(0);
             return false;
         }
-        contractors.put(contractorName, new ServiceContractsContractor(plugin,contractorName,id));
-        plugin.setContractByContractor(contractorName, id);
+        contractors.put(contractorName, new ServiceContractsContractor(contractorName,id));
+        ServiceContractsPlugin.getPlugin().setContractByContractor(contractorName, id);
         removeApplicant(contractorName);
         setOpenings(getOpenings()-1);
         drawSign();
@@ -172,8 +170,8 @@ public class ServiceContractsContract {
 
     public boolean submitTimecard(String contractorName, Integer time){
         if (time >= length) {
-            plugin.sendPlayerMessage(contractorName, "Your contract is complete!");
-            plugin.getContracts().removeContract(id);
+            ServiceContractsPlugin.getPlugin().sendPlayerMessage(contractorName, "Your contract is complete!");
+            ServiceContractsPlugin.getPlugin().getContracts().removeContract(id);
             return pay(contractorName);
         }
         if (time % PAY_INTERVAL == 0)
@@ -186,7 +184,7 @@ public class ServiceContractsContract {
             return false;
         contractors.get(contractorName).pause();
         contractors.remove(contractorName);
-        plugin.removeContractByContractor(contractorName);
+        ServiceContractsPlugin.getPlugin().removeContractByContractor(contractorName);
         return true;
     }
 
@@ -195,8 +193,8 @@ public class ServiceContractsContract {
         for(String contractorId : contractors.keySet()) {
             contractor = contractors.remove(contractorId);
             contractor.pause();
-            plugin.removeContractByContractor(contractorId);
-            plugin.sendPlayerMessage(contractorId, String.format(plugin.getString("REMOVE_CONTRACT"), id));
+            ServiceContractsPlugin.getPlugin().removeContractByContractor(contractorId);
+            ServiceContractsPlugin.getPlugin().sendPlayerMessage(contractorId, String.format(ServiceContractsPlugin.getPlugin().getString("REMOVE_CONTRACT"), id));
         }
 
         return true;
@@ -229,10 +227,10 @@ public class ServiceContractsContract {
         if(!holdings.hasEnough(payment*num)) {
             num = (int)(holdings.balance()/payment);
             if (num > 0) {
-                plugin.sendPlayerMessage(employer, String.format(plugin.getString("MONEY_WARNING"), num));
+                ServiceContractsPlugin.getPlugin().sendPlayerMessage(employer, String.format(ServiceContractsPlugin.getPlugin().getString("MONEY_WARNING"), num));
             }
             else {
-                throw new Exception(plugin.getString("MONEY_ERROR"));
+                throw new Exception(ServiceContractsPlugin.getPlugin().getString("MONEY_ERROR"));
             }
         }
         openings = num;
@@ -248,19 +246,19 @@ public class ServiceContractsContract {
 
     public boolean sendInfoMessage(Player player){
         // @todo l10n
-        plugin.sendPlayerMessage(player, plugin.getString("TYPE_" + type + "_READABLE") + " contract offerd by " + employer);
-        plugin.sendPlayerMessage(player,  payment + "c for " + length + "min of work");
-        plugin.sendPlayerMessage(player, "Contract is located at " + x + ", " + z);
-        plugin.sendPlayerMessage(player, getOpenings() + " opening(s) left");
+        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("TYPE_" + type + "_READABLE") + " contract offerd by " + employer);
+        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player,  payment + "c for " + length + "min of work");
+        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "Contract is located at " + x + ", " + z);
+        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, getOpenings() + " opening(s) left");
         return true;
     }
 
     public boolean addApplicant(String applicant) {
-        return (applicants.add(applicant) && plugin.addContractByApplicant(applicant, id));
+        return (applicants.add(applicant) && ServiceContractsPlugin.getPlugin().addContractByApplicant(applicant, id));
     }
 
     public boolean removeApplicant(String applicant) {
-        return (applicants.remove(applicant) && plugin.removeApplicant(applicant));
+        return (applicants.remove(applicant) && ServiceContractsPlugin.getPlugin().removeApplicant(applicant));
     }
 
     public boolean hasApplicant(String applicant) {
@@ -283,7 +281,7 @@ public class ServiceContractsContract {
 
     public boolean modify(Integer o, Integer p) throws Exception {
         if (p != null && p < payment)
-            throw new Exception(plugin.getString("MODIFY_BAD_PAYMENT"));
+            throw new Exception(ServiceContractsPlugin.getPlugin().getString("MODIFY_BAD_PAYMENT"));
         setOpenings(o);
         setPayment(p);
         return drawSign();

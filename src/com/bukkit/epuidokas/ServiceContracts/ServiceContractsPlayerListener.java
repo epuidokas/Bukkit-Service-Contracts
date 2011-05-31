@@ -41,14 +41,13 @@ public class ServiceContractsPlayerListener extends PlayerListener {
     private final String PERMISSIONS_INFO = "servicecontracts.info";
     private final String PERMISSIONS_INFO_ANY = "servicecontracts.info.any";
 
-    private final ServiceContractsPlugin plugin;
     private HashMap<String,Integer> playerStates = new HashMap<String,Integer>();
     private HashMap<String,String> playerStatesData = new HashMap<String,String>();
     private HashMap<String,ServiceContractsContract> newContracts = new HashMap<String,ServiceContractsContract>();
 
 
-    public ServiceContractsPlayerListener(ServiceContractsPlugin instance) {
-        plugin = instance;
+    public ServiceContractsPlayerListener() {
+
     }
 
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
@@ -59,78 +58,78 @@ public class ServiceContractsPlayerListener extends PlayerListener {
             event.setCancelled(true);
 
         try{
-            ServiceContractsCommand command = new ServiceContractsCommand(plugin, event.getMessage());
+            ServiceContractsCommand command = new ServiceContractsCommand(event.getMessage());
             Player player = event.getPlayer();
             switch(command.getAction()) {
                 // Help
                 case 0:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_HELP)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_HELP));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_HELP)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_HELP));
                         break;
                     }
                     ArrayList<String> commands = command.getCommandFormats(true);
                     for(int i =0; i < commands.size(); i++) {
-                        plugin.sendPlayerMessage(player, commands.get(i));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, commands.get(i));
                     }
                     break;
                 // New
                 case 1:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_NEW)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_NEW));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_NEW)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_NEW));
                         break;
                     }
-                    ServiceContractsContract contract = new ServiceContractsContract(plugin, player, command);
+                    ServiceContractsContract contract = new ServiceContractsContract(player, command);
                     newContracts.put(player.getName(), contract);
                     playerStates.put(player.getName(), 1);
-                    plugin.sendPlayerMessage(player, plugin.getString("SELECT_SIGN"));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("SELECT_SIGN"));
                     break;
                 // Close
                 case 2:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_CLOSE) && !plugin.getPermissions().has(player, PERMISSIONS_CLOSE_ANY)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_CLOSE));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_CLOSE) && !ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_CLOSE_ANY)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_CLOSE));
                         break;
                     }
-                    plugin.sendPlayerMessage(player, plugin.getString("SELECT_SIGN"));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("SELECT_SIGN"));
                     playerStates.put(player.getName(),3);
                     break;
                 // Open
                 case 3:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_OPEN) && !plugin.getPermissions().has(player, PERMISSIONS_OPEN_ANY)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_OPEN));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_OPEN) && !ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_OPEN_ANY)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_OPEN));
                         break;
                     }
-                    plugin.sendPlayerMessage(player, plugin.getString("SELECT_SIGN"));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("SELECT_SIGN"));
                     playerStates.put(player.getName(),4);
                     break;
                 // Remove
                 case 4:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_REMOVE) && !plugin.getPermissions().has(player, PERMISSIONS_REMOVE_ANY)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_REMOVE));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_REMOVE) && !ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_REMOVE_ANY)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_REMOVE));
                         break;
                     }
-                    plugin.sendPlayerMessage(player, plugin.getString("SELECT_SIGN"));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("SELECT_SIGN"));
                     playerStates.put(player.getName(),5);
                     break;
                 // Apply
                 case 5:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_APPLY)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_APPLY));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_APPLY)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_APPLY));
                         break;
                     }
                     String playerStateData = playerStatesData.remove(player.getName());
                     if (playerStateData == null) {
-                        plugin.sendPlayerMessage(player, plugin.getString("SELECT_CONTRACT_FIRST"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("SELECT_CONTRACT_FIRST"));
                         break;
                     }
-                    ServiceContractsContract applyContract = plugin.getContracts().getContract(playerStateData);
-                    Player employer = plugin.getServer().getPlayer(applyContract.getEmployer());
-                    if (!plugin.inDebugMode() && employer.getName().contentEquals(player.getName())) {
-                        plugin.sendPlayerMessage(player, plugin.getString("EMPLOYER_APPLY"));
+                    ServiceContractsContract applyContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(playerStateData);
+                    Player employer = ServiceContractsPlugin.getPlugin().getServer().getPlayer(applyContract.getEmployer());
+                    if (!ServiceContractsPlugin.getPlugin().inDebugMode() && employer.getName().contentEquals(player.getName())) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("EMPLOYER_APPLY"));
                         break;
                     }
-                    if (plugin.getContractByContractor(player.getName()) != null) {
+                    if (ServiceContractsPlugin.getPlugin().getContractByContractor(player.getName()) != null) {
                         // @todo l10n
-                        plugin.sendPlayerMessage(player, "You're already employed!");
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "You're already employed!");
                         break;
                     }
                     // @todo l10n
@@ -138,48 +137,48 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     if (applyContract.getOpenings() > 0) {
                         if (applyContract.hasApplicant(player.getName())) {
                             // already applied
-                            plugin.sendPlayerMessage(player, "You've already applied for this contract!");
+                            ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "You've already applied for this contract!");
                         }
                         else {
                             applyContract.addApplicant(player.getName());
-                            plugin.sendPlayerMessage(player, "Application submitted!");
-                            plugin.sendPlayerMessage(employer, player.getName() + " has applied for your " + plugin.getString("TYPE_" + applyContract.getType()) + " contract.");
-                            plugin.sendPlayerMessage(employer, "To accept, type '/sc -e " + applyContract.getIntId().toString() + " " + player.getName() + "'");
+                            ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "Application submitted!");
+                            ServiceContractsPlugin.getPlugin().sendPlayerMessage(employer, player.getName() + " has applied for your " + ServiceContractsPlugin.getPlugin().getString("TYPE_" + applyContract.getType()) + " contract.");
+                            ServiceContractsPlugin.getPlugin().sendPlayerMessage(employer, "To accept, type '/sc -e " + applyContract.getIntId().toString() + " " + player.getName() + "'");
                         }
                     }
                     else {
-                        plugin.sendPlayerMessage(player, plugin.getString("NO_OPENINGS"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("NO_OPENINGS"));
                     }
                     break;
                 // Employ
                 case 6:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_EMPLOY)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_EMPLOY));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_EMPLOY)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_EMPLOY));
                         break;
                     }
-                    ServiceContractsContract employContract = plugin.getContracts().getContract(command.getContract());
+                    ServiceContractsContract employContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(command.getContract());
                     if (employContract == null) {
-                        plugin.sendPlayerMessage(player, plugin.getString("INVALID_CONTRACT"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("INVALID_CONTRACT"));
                         break;
                     }
-                    if (!employContract.getEmployer().contentEquals(player.getName()) && !plugin.getPermissions().has(player, PERMISSIONS_EMPLOY_ANY)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_EMPLOY_ANY));
+                    if (!employContract.getEmployer().contentEquals(player.getName()) && !ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_EMPLOY_ANY)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_EMPLOY_ANY));
                         break;  
                     }
                     String contractorName = command.getPlayer();
                     if (contractorName == null) {
-                        plugin.sendPlayerMessage(player, plugin.getString("INVALID_CONTRACTOR"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("INVALID_CONTRACTOR"));
                         break;
                     }
-                    Player employEmployer = plugin.getServer().getPlayer(employContract.getEmployer());
+                    Player employEmployer = ServiceContractsPlugin.getPlugin().getServer().getPlayer(employContract.getEmployer());
                     if (!employContract.addContractor(contractorName)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("EMPLOYER_EMPLOY_ERROR"), contractorName));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("EMPLOYER_EMPLOY_ERROR"), contractorName));
                         break;
                     }
 
                     // Remove the contractor's applications for all other contracts
-                    ArrayList<String> applicantContracts = plugin.getContractsByApplicant(contractorName);
-                    ServiceContractsContracts allContracts = plugin.getContracts();
+                    ArrayList<String> applicantContracts = ServiceContractsPlugin.getPlugin().getContractsByApplicant(contractorName);
+                    ServiceContractsContracts allContracts = ServiceContractsPlugin.getPlugin().getContracts();
                     if (applicantContracts instanceof ArrayList) {
                         for(int i=0;i < applicantContracts.size();i++){
                             ServiceContractsContract applicantContract = allContracts.getContract(applicantContracts.get(i));
@@ -188,129 +187,129 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                         }
                     }
                     // @todo l10n
-                    plugin.sendPlayerMessage(employEmployer, "Type `/sc -s " + employContract.getIntId().toString() + " " + contractorName + "` to start paying them.");
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(employEmployer, "Type `/sc -s " + employContract.getIntId().toString() + " " + contractorName + "` to start paying them.");
                     break;
                 // Fire
                 case 7:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_FIRE)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_FIRE));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_FIRE)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_FIRE));
                         break;
                     }
-                    ServiceContractsContract fireContract = plugin.getContracts().getContract(command.getContract());
+                    ServiceContractsContract fireContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(command.getContract());
                     if (fireContract == null) {
-                        plugin.sendPlayerMessage(player, plugin.getString("INVALID_CONTRACT"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("INVALID_CONTRACT"));
                         break;
                     }
-                    if (!fireContract.getEmployer().contentEquals(player.getName()) && !plugin.getPermissions().has(player, PERMISSIONS_FIRE_ANY)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_FIRE_ANY));
+                    if (!fireContract.getEmployer().contentEquals(player.getName()) && !ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_FIRE_ANY)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_FIRE_ANY));
                         break;  
                     }
                     String fireContractorName = command.getPlayer();
                     if (fireContractorName == null) {
-                        plugin.sendPlayerMessage(player, plugin.getString("INVALID_CONTRACTOR"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("INVALID_CONTRACTOR"));
                         break;
                     }
                     if (!fireContract.removeContractor(fireContractorName)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("EMPLOYER_FIRED_ERROR"), fireContractorName));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("EMPLOYER_FIRED_ERROR"), fireContractorName));
                         break;
                     }
-                    plugin.sendPlayerMessage(player, String.format(plugin.getString("EMPLOYER_FIRED"), fireContractorName));
-                    plugin.sendPlayerMessage(fireContractorName, String.format(plugin.getString("CONTRACTOR_FIRED"), fireContractorName));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("EMPLOYER_FIRED"), fireContractorName));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(fireContractorName, String.format(ServiceContractsPlugin.getPlugin().getString("CONTRACTOR_FIRED"), fireContractorName));
                     break;
                 // Start
                 case 8:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_START_PAUSE)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_START_PAUSE));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_START_PAUSE)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_START_PAUSE));
                         break;
                     }
-                    ServiceContractsContract startContract = plugin.getContracts().getContract(command.getContract());
+                    ServiceContractsContract startContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(command.getContract());
                     if (startContract == null) {
-                        plugin.sendPlayerMessage(player, plugin.getString("INVALID_CONTRACT"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("INVALID_CONTRACT"));
                         break;
                     }
-                    if (!startContract.getEmployer().contentEquals(player.getName()) && !plugin.getPermissions().has(player, PERMISSIONS_START_PAUSE_ANY)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_START_PAUSE_ANY));
+                    if (!startContract.getEmployer().contentEquals(player.getName()) && !ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_START_PAUSE_ANY)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_START_PAUSE_ANY));
                         break;  
                     }
                     String startContractorName = command.getPlayer();
                     if (startContractorName == null) {
-                        plugin.sendPlayerMessage(player, plugin.getString("INVALID_CONTRACTOR"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("INVALID_CONTRACTOR"));
                         break;
                     }
                     if (!startContract.startContractor(startContractorName)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("EMPLOYER_START_ERROR"), startContractorName));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("EMPLOYER_START_ERROR"), startContractorName));
                         break;
                     }
-                    plugin.sendPlayerMessage(player, String.format(plugin.getString("EMPLOYER_START_PAY"),startContractorName));
-                    plugin.sendPlayerMessage(startContractorName, plugin.getString("CONTRACTOR_START_PAY"));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("EMPLOYER_START_PAY"), startContractorName));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(startContractorName, ServiceContractsPlugin.getPlugin().getString("CONTRACTOR_START_PAY"));
                     break;
                 // Pause
                 case 9:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_START_PAUSE)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_START_PAUSE));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_START_PAUSE)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_START_PAUSE));
                         break;
                     }
-                    ServiceContractsContract pauseContract = plugin.getContracts().getContract(command.getContract());
+                    ServiceContractsContract pauseContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(command.getContract());
                     if (pauseContract == null) {
-                        plugin.sendPlayerMessage(player, plugin.getString("INVALID_CONTRACT"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("INVALID_CONTRACT"));
                         break;
                     }
-                    if (!pauseContract.getEmployer().contentEquals(player.getName()) && !plugin.getPermissions().has(player, PERMISSIONS_START_PAUSE_ANY)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_START_PAUSE_ANY));
+                    if (!pauseContract.getEmployer().contentEquals(player.getName()) && !ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_START_PAUSE_ANY)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_START_PAUSE_ANY));
                         break;  
                     }
                     String pauseContractorName = command.getPlayer();
                     if (pauseContractorName == null) {
-                        plugin.sendPlayerMessage(player, plugin.getString("INVALID_CONTRACTOR"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("INVALID_CONTRACTOR"));
                         break;
                     }
                     if (!pauseContract.pauseContractor(pauseContractorName)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("EMPLOYER_PAUSE_ERROR"), pauseContractorName));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("EMPLOYER_PAUSE_ERROR"), pauseContractorName));
                         break;
                     }
-                    plugin.sendPlayerMessage(player, String.format(plugin.getString("EMPLOYER_PAUSE_PAY"),pauseContractorName));
-                    plugin.sendPlayerMessage(pauseContractorName, plugin.getString("CONTRACTOR_PAUSE_PAY"));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("EMPLOYER_PAUSE_PAY"), pauseContractorName));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(pauseContractorName, ServiceContractsPlugin.getPlugin().getString("CONTRACTOR_PAUSE_PAY"));
 
                     break;
                 // Quit
                 case 10:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_QUIT)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_QUIT));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_QUIT)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_QUIT));
                         break;
                     }
                     String quitContractorId = player.getName();
-                    String quitContractId = plugin.getContractByContractor(quitContractorId);
-                    ServiceContractsContract quitContract = plugin.getContracts().getContract(quitContractId);
+                    String quitContractId = ServiceContractsPlugin.getPlugin().getContractByContractor(quitContractorId);
+                    ServiceContractsContract quitContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(quitContractId);
                     if (quitContract == null || !quitContract.removeContractor(quitContractorId)){
-                        plugin.sendPlayerMessage(player, plugin.getString("QUIT_FAILED"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("QUIT_FAILED"));
                         break;
                     }
-                    plugin.sendPlayerMessage(player, plugin.getString("CONTRACTOR_QUIT"));
-                    plugin.sendPlayerMessage(quitContract.getEmployer(), String.format(plugin.getString("EMPLOYER_QUIT"),quitContractorId));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("CONTRACTOR_QUIT"));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(quitContract.getEmployer(), String.format(ServiceContractsPlugin.getPlugin().getString("EMPLOYER_QUIT"), quitContractorId));
                     break;
                 // Modify
                 case 11:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_MODIFY)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_MODIFY));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_MODIFY)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_MODIFY));
                         break;
                     }
-                    plugin.sendPlayerMessage(player, plugin.getString("SELECT_SIGN"));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("SELECT_SIGN"));
                     playerStatesData.put(player.getName(), event.getMessage());
                     playerStates.put(player.getName(),6);
                     break;
                 // Info
                 case 12:
-                    if (!plugin.getPermissions().has(player, PERMISSIONS_INFO)) {
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("NO_PERMISSIONS"), PERMISSIONS_INFO));
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_INFO)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_INFO));
                         break;
                     }
-                    plugin.sendPlayerMessage(player, plugin.getString("SELECT_SIGN"));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("SELECT_SIGN"));
                     playerStates.put(player.getName(),2);
                     break;
             }
         }
         catch(Exception e) {
-            plugin.handleException(e, event.getPlayer().getName());
+            ServiceContractsPlugin.getPlugin().handleException(e, event.getPlayer().getName());
         }
     }
 
@@ -330,69 +329,69 @@ public class ServiceContractsPlayerListener extends PlayerListener {
             case 1:
                 // @todo check if they have permissions for the block
                 String newId = ServiceContractsContract.createId(sign.getX(),sign.getY(),sign.getZ());
-                if (plugin.getContracts().contains(newId)) {
+                if (ServiceContractsPlugin.getPlugin().getContracts().contains(newId)) {
                     newContracts.remove(playerName);
                     playerStates.remove(playerName);
-                    plugin.sendPlayerMessage(player, plugin.getString("CONTRACT_ALREADY_THERE"));
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("CONTRACT_ALREADY_THERE"));
                     break;
                 }
                 ServiceContractsContract newContract = newContracts.get(playerName);
                 newContract.setId(sign);
                 newContract.drawSign();
-                plugin.getContracts().addContract(newContract);
+                ServiceContractsPlugin.getPlugin().getContracts().addContract(newContract);
                 newContracts.remove(playerName);
                 playerStates.remove(playerName);
-                plugin.sendPlayerMessage(player, plugin.getString("CONTRACT_CREATED"));
+                ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("CONTRACT_CREATED"));
                 break;
             // Info
             case 2:
                 String infoId = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
-                ServiceContractsContract infoContract = plugin.getContracts().getContract(infoId);
+                ServiceContractsContract infoContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(infoId);
                 if(infoContract instanceof ServiceContractsContract) {
                     infoContract.sendInfoMessage(player);
                 }
                 else {
                     // @todo l10n
-                    plugin.sendPlayerMessage(player, "That is not a service contract sign");
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "That is not a service contract sign");
                 }
                 playerStates.remove(playerName);
                 break;
             // Close
             case 3:
                 String closeId = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
-                ServiceContractsContract closeContract = plugin.getContracts().getContract(closeId);
-                if(closeContract instanceof ServiceContractsContract && (closeContract.getEmployer().contentEquals(playerName) || plugin.getPermissions().has(player, PERMISSIONS_CLOSE_ANY))) {
+                ServiceContractsContract closeContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(closeId);
+                if(closeContract instanceof ServiceContractsContract && (closeContract.getEmployer().contentEquals(playerName) || ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_CLOSE_ANY))) {
                     closeContract.disable();
                 }
                 else {
                     // @todo l10n
-                    plugin.sendPlayerMessage(player, "Close failed.");
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "Close failed.");
                 }
                 playerStates.remove(playerName);
                 break;
             // Open
             case 4:
                 String openId = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
-                ServiceContractsContract openContract = plugin.getContracts().getContract(openId);
-                if(openContract instanceof ServiceContractsContract && (openContract.getEmployer().contentEquals(playerName)||plugin.getPermissions().has(player, PERMISSIONS_OPEN_ANY))) {
+                ServiceContractsContract openContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(openId);
+                if(openContract instanceof ServiceContractsContract && (openContract.getEmployer().contentEquals(playerName)||ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_OPEN_ANY))) {
                     openContract.enable();
                 }
                 else {
                     // @todo l10n
-                    plugin.sendPlayerMessage(player, "Open failed.");
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "Open failed.");
                 }
                 playerStates.remove(playerName);
                 break;
             // Remove
             case 5:
                 String removeId = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
-                ServiceContractsContract removeContract = plugin.getContracts().getContract(removeId);
-                if(removeContract instanceof ServiceContractsContract && (removeContract.getEmployer().contentEquals(playerName)||plugin.getPermissions().has(player, PERMISSIONS_REMOVE_ANY))) {
-                    plugin.getContracts().removeContract(removeId);
+                ServiceContractsContract removeContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(removeId);
+                if(removeContract instanceof ServiceContractsContract && (removeContract.getEmployer().contentEquals(playerName)||ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_REMOVE_ANY))) {
+                    ServiceContractsPlugin.getPlugin().getContracts().removeContract(removeId);
                 }
                 else {
                     // @todo l10n
-                    plugin.sendPlayerMessage(player, "Remove failed.");
+                    ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "Remove failed.");
                 }
                 playerStates.remove(playerName);
                 break;
@@ -402,32 +401,32 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                 playerStatesData.remove(playerName);
                 playerStates.remove(playerName);
                 try {
-                    ServiceContractsCommand command = new ServiceContractsCommand(plugin, commandString);
+                    ServiceContractsCommand command = new ServiceContractsCommand(commandString);
                     String modifyId = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
-                    ServiceContractsContract modifyContract = plugin.getContracts().getContract(modifyId);
+                    ServiceContractsContract modifyContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(modifyId);
                     modifyContract.modify((Integer)command.getOpenings(), (Integer)command.getPayment());
                 }
                 catch(Exception e){
-                    plugin.handleException(e, playerName);
+                    ServiceContractsPlugin.getPlugin().handleException(e, playerName);
                 }
                 break;
             // No state (applying)
             default:
                 String id = ServiceContractsContract.createId(sign.getX(), sign.getY(), sign.getZ());
-                ServiceContractsContract contract = plugin.getContracts().getContract(id);
+                ServiceContractsContract contract = ServiceContractsPlugin.getPlugin().getContracts().getContract(id);
                 if(contract instanceof ServiceContractsContract) {
-                    if (!plugin.inDebugMode() && contract.getEmployer() == player.getName()) {
+                    if (!ServiceContractsPlugin.getPlugin().inDebugMode() && contract.getEmployer() == player.getName()) {
                         contract.sendInfoMessage(player);
                     }
                     else if(contract.getOpenings() > 0) {
                         // @todo get the '/sc -a' string from the ServiceContractsCommand class
                         contract.sendInfoMessage(player);
-                        plugin.sendPlayerMessage(player, String.format(plugin.getString("APPLY"),"/sc -a"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("APPLY"),"/sc -a"));
                         playerStates.remove(playerName);
                         playerStatesData.put(playerName, id);
                     }
                     else {
-                        plugin.sendPlayerMessage(player, plugin.getString("NO_OPENINGS"));
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("NO_OPENINGS"));
                     }
                 }
         }

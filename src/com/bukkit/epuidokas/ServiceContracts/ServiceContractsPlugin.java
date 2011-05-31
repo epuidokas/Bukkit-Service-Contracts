@@ -26,18 +26,21 @@ public class ServiceContractsPlugin extends JavaPlugin {
 
     private static iConomy iConomy = null;
     private static PermissionHandler permissions = null;
-    private final ServiceContractsContracts contracts = new ServiceContractsContracts(this);
+    private final ServiceContractsContracts contracts = new ServiceContractsContracts();
     private final HashMap<String,String> contractors = new HashMap();
     private final HashMap<String,ArrayList<String>> applicants = new HashMap();
-    private final ServiceContractsPlayerListener playerListener = new ServiceContractsPlayerListener(this);
-    private final ServiceContractsPluginListener pluginListener = new ServiceContractsPluginListener(this);
-    private final ServiceContractsBlockListener blockListener = new ServiceContractsBlockListener(this);
+    private final ServiceContractsPlayerListener playerListener = new ServiceContractsPlayerListener();
+    private final ServiceContractsPluginListener pluginListener = new ServiceContractsPluginListener();
+    private final ServiceContractsBlockListener blockListener = new ServiceContractsBlockListener();
     private final HashMap<Integer,String> contractIdMapping = new HashMap();
     private Integer lastContractId = 0;
     private final Properties strings = new Properties();
     private final boolean debugMode = true;
+    private static ServiceContractsPlugin plugin;
 
     public void onEnable() {
+
+        plugin = this;
 
         // Set up plugin directory
         getDataFolder().mkdir();
@@ -250,5 +253,9 @@ public class ServiceContractsPlugin extends JavaPlugin {
             return account.getMainBankAccount().getHoldings();
         }
         return account.getHoldings();
+    }
+
+    public static ServiceContractsPlugin getPlugin(){
+        return plugin;
     }
 }

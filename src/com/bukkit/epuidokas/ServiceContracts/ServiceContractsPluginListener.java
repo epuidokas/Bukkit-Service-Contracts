@@ -11,30 +11,28 @@ import org.bukkit.event.server.PluginEnableEvent;
  * @author ep
  */
 public class ServiceContractsPluginListener extends ServerListener {
-    private ServiceContractsPlugin plugin;
 
-    public ServiceContractsPluginListener(ServiceContractsPlugin instance) {
-        plugin = instance;
+    public ServiceContractsPluginListener() {
     }
 
     @Override
     public void onPluginEnable(PluginEnableEvent event) {
         
         // Link iConomy
-        if(plugin.getIConomy() == null) {
-            Plugin iconomy = plugin.getServer().getPluginManager().getPlugin("iConomy");
+        if(ServiceContractsPlugin.getPlugin().getIConomy() == null) {
+            Plugin iconomy = ServiceContractsPlugin.getPlugin().getServer().getPluginManager().getPlugin("iConomy");
             if (iconomy != null) {
                 if (iconomy.isEnabled() && iconomy.getClass().getName().equals("com.iConomy.iConomy")) {
-                    plugin.setIConomy((iConomy)iconomy);
+                    ServiceContractsPlugin.getPlugin().setIConomy((iConomy)iconomy);
                 }
             }
         }
 
         // Link Permissions
-        if(plugin.getPermissions() == null) {
-            Plugin permissions = plugin.getServer().getPluginManager().getPlugin("Permissions");
+        if(ServiceContractsPlugin.getPlugin().getPermissions() == null) {
+            Plugin permissions = ServiceContractsPlugin.getPlugin().getServer().getPluginManager().getPlugin("Permissions");
             if (permissions != null) {
-                plugin.setPermissions((Permissions)permissions);
+                ServiceContractsPlugin.getPlugin().setPermissions((Permissions)permissions);
             }
         }
     }
