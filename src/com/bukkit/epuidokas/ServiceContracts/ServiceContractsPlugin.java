@@ -26,17 +26,17 @@ public class ServiceContractsPlugin extends JavaPlugin {
 
     private static iConomy iConomy = null;
     private static PermissionHandler permissions = null;
-    private final ServiceContractsContracts contracts = new ServiceContractsContracts();
-    private final HashMap<String,String> contractors = new HashMap();
-    private final HashMap<String,ArrayList<String>> applicants = new HashMap();
+    private ServiceContractsContracts contracts = new ServiceContractsContracts();
+    private HashMap<String,String> contractors = new HashMap();
+    private HashMap<String,ArrayList<String>> applicants = new HashMap();
     private final ServiceContractsPlayerListener playerListener = new ServiceContractsPlayerListener();
     private final ServiceContractsPluginListener pluginListener = new ServiceContractsPluginListener();
     private final ServiceContractsBlockListener blockListener = new ServiceContractsBlockListener();
     private final ServiceContractsWorldListener worldListener = new ServiceContractsWorldListener();
-    private final HashMap<Integer,String> contractIdMapping = new HashMap();
+    private HashMap<Integer,String> contractIdMapping = new HashMap();
     private Integer lastContractId = 0;
     private final Properties strings = new Properties();
-    private final boolean debugMode = true;
+    private boolean debugMode = true;
     private static ServiceContractsPlugin plugin;
 
     public void onEnable() {
@@ -72,7 +72,6 @@ public class ServiceContractsPlugin extends JavaPlugin {
         pm.registerEvent(Event.Type.WORLD_SAVE, worldListener, Event.Priority.Highest, this);
 
         restoreAllData();
-        log("LAST CONTRACT ID:" + lastContractId);
 
         // Load successful
         log("loaded");
@@ -271,7 +270,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
         backupData(filepath +"applicants.bak", applicants);
         backupData(filepath +"contractIdMapping.bak", contractIdMapping);
         backupData(filepath +"lastContractId.bak", lastContractId);
-        log("Back-up saved!");
+        log("back-up saved!");
         return true;
     }
 
@@ -294,33 +293,46 @@ public class ServiceContractsPlugin extends JavaPlugin {
 
     public boolean restoreAllData() {
         String filepath = this.getDataFolder() + File.separator;
-        backupData(filepath +"contracts.bak", contracts);
-        backupData(filepath +"contractors.bak", contractors);
-        backupData(filepath +"applicants.bak", applicants);
-        backupData(filepath +"contractIdMapping.bak", contractIdMapping);
-        backupData(filepath +"lastContractId.bak", lastContractId);
-        log("Back-up data restored!");
+        if((new File(filepath +"contracts.bak")).exists()){
+            contracts = (ServiceContractsContracts) restoreData(filepath +"contracts.bak");
+            contractors = (HashMap<String,String>) restoreData(filepath +"contractors.bak");
+            applicants = (HashMap<String,ArrayList<String>>) restoreData(filepath +"applicants.bak");
+            contractIdMapping = (HashMap<Integer,String>) restoreData(filepath +"contractIdMapping.bak");
+            lastContractId = (Integer) restoreData(filepath +"lastContractId.bak");
+            log("back-up data restored!");
+        }
+        else
+        {
+            log("no back-up to restore.");
+        }
         return true;
     }
 
-    private boolean restoreData(String filename, Object data){
-        FileInputStream fis = null;
-        ObjectInputStream in = null;
-        try
-        {
-            fis = new FileInputStream(filename);
-            in = new ObjectInputStream(fis);
-            data = in.readObject();
-            in.close();
+    private Object restoreData(String filename){
+        if((new File(filename)).exists()){
+            Object data = null;
+            FileInputStream fis = null;
+            ObjectInputStream in = null;
+            try
+            {
+                fis = new FileInputStream(filename);
+                in = new ObjectInputStream(fis);
+                data = in.readObject();
+                in.close();
+            }
+            catch(IOException ex)
+            {
+                ex.printStackTrace();
+            }
+            catch(ClassNotFoundException ex)
+            {
+                ex.printStackTrace();
+            }
+            return data;
         }
-        catch(IOException ex)
+        else
         {
-            ex.printStackTrace();
+            return null;
         }
-        catch(ClassNotFoundException ex)
-        {
-            ex.printStackTrace();
-        }
-        return true;
     }
 }
