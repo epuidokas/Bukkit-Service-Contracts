@@ -9,16 +9,20 @@ import org.bukkit.entity.Player;
  */
 public class ServiceContractsContractor implements Serializable {
 
-    private final int NUM_OF_SEC_PER_MIN = 5;
+    private final int NUM_OF_SEC_PER_MIN = 60;
 
-    private final String playerName;
-    private final String contractId;
+    private String playerName;
+    private String contractId;
     private Integer time = 0;
     private Integer taskId = null;
 
     public ServiceContractsContractor(String player, String contract){
         playerName=player;
         contractId=contract;
+    }
+
+    public String getName(){
+        return playerName;
     }
 
     public boolean start (){

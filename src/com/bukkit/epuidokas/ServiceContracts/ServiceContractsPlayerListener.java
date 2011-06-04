@@ -2,6 +2,8 @@ package com.bukkit.epuidokas.ServiceContracts;
 
 import java.io.*;
 import java.util.*;
+
+import com.avaje.ebeaninternal.server.el.ElSetValue;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -40,6 +42,10 @@ public class ServiceContractsPlayerListener extends PlayerListener {
     private final String PERMISSIONS_MODIFY_ANY = "servicecontracts.modify.any";
     private final String PERMISSIONS_INFO = "servicecontracts.info";
     private final String PERMISSIONS_INFO_ANY = "servicecontracts.info.any";
+    private final String PERMISSIONS_LIST = "servicecontracts.list";
+    private final String PERMISSIONS_LIST_ALL = "servicecontracts.list.all";
+    private final String PERMISSIONS_WORKERS = "servicecontracts.workers";
+    private final String PERMISSIONS_JOB = "servicecontracts.job";
 
     private HashMap<String,Integer> playerStates = new HashMap<String,Integer>();
     private HashMap<String,String> playerStatesData = new HashMap<String,String>();
@@ -305,6 +311,63 @@ public class ServiceContractsPlayerListener extends PlayerListener {
                     }
                     ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("SELECT_SIGN"));
                     playerStates.put(player.getName(),2);
+                    break;
+                // List
+                case 13:
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_LIST)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_LIST));
+                        break;
+                    }
+                    ArrayList<String> contractsList;
+                    if (command.isAll()){
+                        if(!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_LIST)) {
+                            ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_LIST_ALL));
+                            break;
+                        }
+                        // @todo Build ArrayList of all contracts for all players
+                        contractsList = ServiceContractsPlugin.getPlugin().getContracts().getAllContracts();
+                    } else {
+                        contractsList = ServiceContractsPlugin.getPlugin().getContracts().getContractsByEmployer(player.getName());
+                    }
+
+                    Iterator<String> iterator = contractsList.iterator();
+                    while ( iterator.hasNext() ){
+                        ServiceContractsContract listContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(iterator.next());
+                        // @todo l10n
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, listContract.getIntId() + " - " + listContract.getReadableType());
+                    }
+
+                    break;
+                // Workers
+                case 14:
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_WORKERS)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_WORKERS));
+                        break;
+                    }
+                    ArrayList<String> contractsWorkers = ServiceContractsPlugin.getPlugin().getContracts().getContractsByEmployer(player.getName());
+                    Iterator<String> iteratorWorkers = contractsWorkers.iterator();
+                    while ( iteratorWorkers.hasNext() ){
+                        ServiceContractsContract listContract = ServiceContractsPlugin.getPlugin().getContracts().getContract(iteratorWorkers.next());
+                        ArrayList<ServiceContractsContractor> contractors = listContract.getContractors();
+                        Iterator<ServiceContractsContractor> iteratorContractors = contractors.iterator();
+                        while ( iteratorContractors.hasNext() ){
+                            // @todo l10n
+                            ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, listContract.getIntId() + " - " + iteratorContractors.next().getName());
+                        }
+                    }
+                    break;
+                // Job
+                case 15:
+                    if (!ServiceContractsPlugin.getPlugin().getPermissions().has(player, PERMISSIONS_JOB)) {
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, String.format(ServiceContractsPlugin.getPlugin().getString("NO_PERMISSIONS"), PERMISSIONS_JOB));
+                        break;
+                    }
+                    String job = ServiceContractsPlugin.getPlugin().getContractByContractor(player.getName());
+                    if (job != null)
+                        ServiceContractsPlugin.getPlugin().getContracts().getContract(job).sendInfoMessage(player);
+                    else
+                        // @todo l10n
+                        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "You are currently unemployed.");
                     break;
             }
         }

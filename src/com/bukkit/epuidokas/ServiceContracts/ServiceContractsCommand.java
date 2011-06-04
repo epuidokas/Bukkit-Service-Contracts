@@ -1,5 +1,6 @@
 package com.bukkit.epuidokas.ServiceContracts;
 
+import javax.print.DocFlavor;
 import java.util.*;
 
 /**
@@ -19,6 +20,8 @@ public class ServiceContractsCommand {
     private String message = "";
     private String player = "";
     private Integer contract = null;
+    private boolean all = false;
+    private Integer page = null;
 
     public ServiceContractsCommand(String command) throws Exception{
 
@@ -145,6 +148,47 @@ public class ServiceContractsCommand {
             action = 12;
         }
 
+        // List contracts
+        else if(action_str.contentEquals("-" + ServiceContractsPlugin.getPlugin().getString("COMMAND_LIST_SHORT")) || action_str.contentEquals(ServiceContractsPlugin.getPlugin().getString("COMMAND_LIST"))) {
+            action = 13;
+            switch (command_parts.length){
+                case 4:
+                    if (!parseAll(command_parts[2]))
+                        throw new Exception(String.format(ServiceContractsPlugin.getPlugin().getString("INVALID_ALL"), command_parts[2], getCommandFormat(13)));
+                    if (!parsePage(command_parts[3]))
+                        throw new Exception(String.format(ServiceContractsPlugin.getPlugin().getString("INVALID_PAGE"), command_parts[2], getCommandFormat(13)));
+                    break;
+                case 3:
+                    if (!parseAll(command_parts[2]) && !parsePage(command_parts[2]))
+                        throw new Exception(String.format(ServiceContractsPlugin.getPlugin().getString("INVALID_PAGE"), command_parts[2], getCommandFormat(13)));
+                    break;
+                case 2:
+                    break;
+                default:
+                    throw new Exception(String.format(ServiceContractsPlugin.getPlugin().getString("INVALID_COMMAND"), getCommandFormat(13)));
+            }
+        }
+
+        // List workers
+        else if(action_str.contentEquals("-" + ServiceContractsPlugin.getPlugin().getString("COMMAND_WORKERS_SHORT")) || action_str.contentEquals(ServiceContractsPlugin.getPlugin().getString("COMMAND_WORKERS"))) {
+            action = 14;
+            switch (command_parts.length){
+                case 3:
+                    if (!parsePage(command_parts[2]))
+                        throw new Exception(String.format(ServiceContractsPlugin.getPlugin().getString("INVALID_PAGE"), command_parts[2], getCommandFormat(14)));
+                    break;
+                case 2:
+                    break;
+                default:
+                    throw new Exception(String.format(ServiceContractsPlugin.getPlugin().getString("INVALID_COMMAND"), getCommandFormat(14)));
+            }
+        }
+
+        // List current job
+        else if(action_str.contentEquals("-" + ServiceContractsPlugin.getPlugin().getString("COMMAND_JOB_SHORT")) || action_str.contentEquals(ServiceContractsPlugin.getPlugin().getString("COMMAND_JOB"))) {
+            action = 15;
+        }
+
 
         // Command not recognized
         else {
@@ -194,6 +238,14 @@ public class ServiceContractsCommand {
 
     public Integer getContract() {
         return contract;
+    }
+
+    public boolean isAll(){
+        return all;
+    }
+
+    public Integer getPage(){
+        return page;
     }
 
     private boolean parseType(String str) {
@@ -292,6 +344,23 @@ public class ServiceContractsCommand {
     private boolean parseContract(String str) {
         contract = Integer.parseInt(str);
         return true;
+    }
+
+    private boolean parseAll(String str) {
+        if (str.contentEquals(ServiceContractsPlugin.getPlugin().getString("ANY_COMMAND_ALL"))) {
+            all=true;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean parsePage(String str) {
+        Integer pageInt = Integer.parseInt(str);
+        if (pageInt != null && pageInt > 0) {
+            page=pageInt;
+            return true;
+        }
+        return false;
     }
 
     public String getCommandFormat() {
@@ -502,6 +571,48 @@ public class ServiceContractsCommand {
                             ServiceContractsPlugin.getPlugin().getString("COMMAND"),
                             ServiceContractsPlugin.getPlugin().getString("COMMAND_INFO_SHORT"),
                             ServiceContractsPlugin.getPlugin().getString("COMMAND_INFO"));
+                }
+            // LIST
+            case 13:
+                if (!full) {
+                    return String.format("/%s -%s",
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND"),
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND_LIST_SHORT"));
+                }
+                else {
+                    return String.format("/%s -%s|%s [%s]",
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND"),
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND_LIST_SHORT"),
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND_LIST"),
+                            ServiceContractsPlugin.getPlugin().getString("ANY_COMMAND_ALL"),
+                            ServiceContractsPlugin.getPlugin().getString("ANY_COMMAND_PAGE"));
+                }
+            // WORKERS
+            case 14:
+                if (!full) {
+                    return String.format("/%s -%s",
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND"),
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND_WORKERS_SHORT"));
+                }
+                else {
+                    return String.format("/%s -%s|%s",
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND"),
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND_WORKERS_SHORT"),
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND_WORKERS"),
+                            ServiceContractsPlugin.getPlugin().getString("ANY_COMMAND_PAGE"));
+                }
+            // JOB
+            case 15:
+                if (!full) {
+                    return String.format("/%s -%s",
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND"),
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND_JOB_SHORT"));
+                }
+                else {
+                    return String.format("/%s -%s|%s",
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND"),
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND_JOB_SHORT"),
+                            ServiceContractsPlugin.getPlugin().getString("COMMAND_JOB"));
                 }
         }
         return "";

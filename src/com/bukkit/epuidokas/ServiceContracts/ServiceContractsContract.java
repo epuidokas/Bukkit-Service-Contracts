@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Block;
 import com.iConomy.*;
+import sun.reflect.generics.tree.ReturnType;
 
 /**
  *
@@ -48,6 +49,16 @@ public class ServiceContractsContract implements Serializable {
         z = command.getZ();
         employer = player.getName();
         setOpenings(command.getOpenings());
+    }
+
+    public ArrayList<ServiceContractsContractor> getContractors(){
+        ArrayList<ServiceContractsContractor> contractorsArr = new ArrayList();
+        Collection c = contractors.values();
+        Iterator itr = c.iterator();
+        while(itr.hasNext()){
+            contractorsArr.add((ServiceContractsContractor) itr.next());
+        }
+        return contractorsArr;
     }
 
     public boolean setId(Sign sign) {
@@ -247,11 +258,15 @@ public class ServiceContractsContract implements Serializable {
 
     public boolean sendInfoMessage(Player player){
         // @todo l10n
-        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, ServiceContractsPlugin.getPlugin().getString("TYPE_" + type + "_READABLE") + " contract offerd by " + employer);
+        ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, getReadableType() + " contract offerd by " + employer);
         ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, payment + "c for " + length + "min of work");
         ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, "Contract is located at " + x + ", " + z);
         ServiceContractsPlugin.getPlugin().sendPlayerMessage(player, getOpenings() + " opening(s) left");
         return true;
+    }
+
+    public String getReadableType(){
+        return ServiceContractsPlugin.getPlugin().getString("TYPE_" + type + "_READABLE");
     }
 
     public boolean addApplicant(String applicant) {

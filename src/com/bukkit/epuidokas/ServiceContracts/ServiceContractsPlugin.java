@@ -36,7 +36,7 @@ public class ServiceContractsPlugin extends JavaPlugin {
     private HashMap<Integer,String> contractIdMapping = new HashMap();
     private Integer lastContractId = 0;
     private final Properties strings = new Properties();
-    private boolean debugMode = true;
+    private boolean debugMode = false;
     private static ServiceContractsPlugin plugin;
 
     public void onEnable() {
